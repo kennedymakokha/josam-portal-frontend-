@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export default function Modal({ isOpen, onClose, children }: any) {
     if (!isOpen) return null;
     return (
