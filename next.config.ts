@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   },
   productionBrowserSourceMaps: false,
   reactStrictMode: true,
-  swcMinify: true,
+
   experimental: {
     scrollRestoration: true,
   },
