@@ -5,6 +5,12 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['app.kersacco.co.ke',"localhost"],
   },
+  productionBrowserSourceMaps: false,
+  reactStrictMode: true,
+  swcMinify: true,
+  experimental: {
+    scrollRestoration: true,
+  },
 };
 
 export default nextConfig;
