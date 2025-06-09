@@ -25,7 +25,7 @@ export default function ComingSoon() {
           transition={{ delay: 0.5, duration: 0.5 }}
           className="text-lg text-gray-300 mb-6"
         >
-          We're working hard to bring something amazing. Stay tuned!
+          Were working hard to bring something amazing. Stay tuned!
         </motion.p>
         <motion.button
           whileHover={{ scale: 1.05 }}
