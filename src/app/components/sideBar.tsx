@@ -2,8 +2,8 @@ import Link from 'next/link';
 
 const navItems = [
     { name: 'Dashboard', path: '/dashboard' },
-    { name: 'Vendors', path: '/dashboard/vendors' },
-    { name: 'Users', path: '/users' },
+    { name: 'Forms', path: '/dashboard/forms' },
+    // { name: 'Users', path: '/users' },
     { name: 'Settings', path: '/settings' },
 ];
 

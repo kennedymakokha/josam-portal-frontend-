@@ -7,6 +7,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { useEffect, useState } from "react";
 import { Toaster } from 'sonner';
 import { persistor, store } from "../../store/store";
+import { Providers } from "./providers";
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,7 +24,7 @@ export default function RootLayout({
       <body>   <Provider store={store}>
         {isMounted ? (
           <PersistGate loading={null} persistor={persistor}>
-            {children}
+            <Providers>{children}</Providers>
             <Toaster richColors position="top-right" />
           </PersistGate>
         ) : null}

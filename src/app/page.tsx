@@ -1,38 +1,31 @@
 'use client';
-
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
-export default function ComingSoon() {
+export default function HomePage() {
+  const router = useRouter();
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white p-6">
+    <div className="min-h-screen bg-gradient-to-tr from-slate-900 via-slate-600 to-slate-700 flex items-center justify-center">
       <motion.div
-        initial={{ opacity: 0, y: 40 }}
+        initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
-        className="text-center max-w-2xl"
+        transition={{ duration: 0.8 }}
+        className="text-center bg-white/10 backdrop-blur-md p-10 rounded-3xl shadow-xl max-w-lg mx-4 border border-white/20"
       >
-        <motion.h1
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          className="text-4xl md:text-6xl font-bold mb-4"
-        >
-          🚧 Coming Soon
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="text-lg text-gray-300 mb-6"
-        >
-          Were working hard to bring something amazing. Stay tuned!
-        </motion.p>
+        <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-wide">
+          Dynamic Form Builder
+        </h1>
+        <p className="text-white/80 text-lg mb-8 leading-relaxed">
+          Effortlessly create, customize, and deploy stunning forms without writing a single line of code.
+        </p>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="bg-white text-black px-6 py-2 rounded-full font-medium transition-all"
+          onClick={() => router.push('/auth')}
+          className="px-8 py-3 bg-white text-blue-900 font-semibold rounded-full shadow-md hover:bg-gray-200 transition"
         >
-          Notify Me
+          Get Started
         </motion.button>
       </motion.div>
     </div>
