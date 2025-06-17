@@ -3,7 +3,17 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    domains: ['app.kersacco.co.ke',"localhost","formbuilder.mtandao.app"],
+    domains: ['formbuilder.mtandao.app'],
+
+    // domains: ['app.kersacco.co.ke',"localhost","formbuilder.mtandao.app"],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'formbuilder.mtandao.app',
+        port: '',
+        pathname: '/uploads/**',
+      },
+    ],
   },
   productionBrowserSourceMaps: false,
   reactStrictMode: true,
