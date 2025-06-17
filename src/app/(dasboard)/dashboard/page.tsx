@@ -173,17 +173,7 @@ export default function ServiceTable() {
                         <div>
                             <strong>Service Image:</strong>
                             <div className="mt-2">
-                                {option.image}
-                                <Image
-                                    src="http://formbuilder.mtandao.app/api/uploads/8084c38b-6aeb-4a27-be37-89a7017f5e3d-test.png"
-                                    alt='option.image'
-                                    width={128}
-                                    height={128}
-                                    className="w-32 h-32 object-cover rounded border"
-                                    priority // 👈 Add this line
-                                />
-                                {/* {option.image !== null && <Image width={100} height={100} src="http://formbuilder.mtandao.app/api/uploads/8084c38b-6aeb-4a27-be37-89a7017f5e3d-test.png" alt={option.image} className="w-32 h-32 object-cover rounded border" />}
-                                {option.image ? (
+                                  {option.image ? (
                                     typeof option.image === 'string' ? (
                                         // If it's a URL string (e.g., from backend)
                                         <Image width={100} height={100} src={option.image} alt="" className="w-32 h-32 object-cover rounded border" />
@@ -193,7 +183,7 @@ export default function ServiceTable() {
                                     )
                                 ) : (
                                     <span className="text-gray-400 italic">No image provided</span>
-                                )} */}
+                                )}
                             </div>
                         </div>
 
