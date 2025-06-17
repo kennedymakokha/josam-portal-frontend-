@@ -10,10 +10,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   const { user } = useSelector((state: any) => state.auth)
-  
+
   useEffect(() => {
-    if (user) {
-      router.push('/dashboard');
+    if (!user) {
+      router.push('/auh');
     }
   }, [user, router]);
   return (
