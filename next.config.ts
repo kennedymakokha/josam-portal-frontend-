@@ -8,8 +8,8 @@ const nextConfig: NextConfig = {
     // domains: ['app.kersacco.co.ke',"localhost","formbuilder.mtandao.app"],
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'formbuilder.mtandao.app',
+        protocol: 'https',
+        hostname: 'form-builder.mtandao.app',
         port: '',
         pathname: '/uploads/**',
       },
