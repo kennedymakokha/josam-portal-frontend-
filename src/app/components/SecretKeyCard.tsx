@@ -8,7 +8,7 @@ import { useUpdateKeyMutation } from '../../../store/features/authApi';
 export default function SecretKeyCard() {
     const [key, setKey] = useState('');
     const [copied, setCopied] = useState(false);
-    const [upateKey, isLoading] = useUpdateKeyMutation()
+    const [upateKey] = useUpdateKeyMutation()
     const handleCopy = async () => {
         if (!key) return;
         try {
