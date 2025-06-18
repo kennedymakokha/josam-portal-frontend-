@@ -23,6 +23,13 @@ export const injectEndpoints = api.injectEndpoints({
                 body,
             }),
         }),
+        updateKey: builder.mutation({
+            query: (body) => ({
+                url: '/auth/update_key',
+                method: 'POST',
+                body,
+            }),
+        }),
         getSession: builder.query({
             query: () => '/auth',
         }),
@@ -45,4 +52,5 @@ export const {
     useGetSessionQuery,
     useLogoutMutation,
     useGetusersQuery,
+    useUpdateKeyMutation,
 } = injectEndpoints;

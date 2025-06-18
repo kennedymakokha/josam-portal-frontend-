@@ -114,7 +114,7 @@ export default function ServiceTable() {
     return (
         <div className="space-y-10 text-black p-4 bg-gray-100 min-h-screen">
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold">Available Services</h1>
+                <h1 className="text-2xl font-bold">My forms</h1>
                 <button
                     onClick={() => {
                         setEditMode(false);
@@ -123,14 +123,14 @@ export default function ServiceTable() {
                     }}
                     className="bg-green-600 text-white px-4 py-2 rounded"
                 >
-                    + Add Service
+                    + Add Form
                 </button>
             </div>
 
             {parsedServices.map((option: Service) => (
                 <div key={option._id} className="bg-white rounded-lg shadow-md p-6 mb-6">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold">{option.name} Services</h2>
+                        <h2 className="text-xl font-bold">{option.name} Form</h2>
                         <div className="flex gap-2">
                             <button
                                 onClick={() => {
@@ -171,12 +171,12 @@ export default function ServiceTable() {
 
                         {/* Image Preview Row */}
                         <div>
-                            <strong>Service Image:</strong>
+                            <strong>Form Image:</strong>
                             <div className="mt-2">
-                                {option.image ? (
+                                  {option.image ? (
                                     typeof option.image === 'string' ? (
                                         // If it's a URL string (e.g., from backend)
-                                        <Image width={100} height={100} src={option.image} alt="Service" className="w-32 h-32 object-cover rounded border" />
+                                        <Image width={100} height={100} src={option.image} alt="" className="w-32 h-32 object-cover rounded border" />
                                     ) : (
                                         // If it's a File object (local preview)
                                         <Image height={1000} width={100} src={URL.createObjectURL(option.image)} alt="Preview" className="w-32 h-32 object-cover rounded border" />
