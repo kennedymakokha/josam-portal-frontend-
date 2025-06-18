@@ -3,12 +3,13 @@ import { useEffect, useState } from 'react';
 import AuthForm from '../components/AuthForm';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 
 export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true);
     const router = useRouter();
 
-    const { user } = useSelector((state: any) => state.auth)
+    const { user } = useSelector((state: RootState) => state.auth)
     
     useEffect(() => {
       if (user) {

@@ -4,12 +4,13 @@ import Header from "../components/header";
 import Sidebar from "../components/sideBar";
 import { useEffect } from "react";
 import { useRouter } from 'next/navigation';
+import { RootState } from "../../../store/store";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
 
   const router = useRouter();
 
-  const { user } = useSelector((state: any) => state.auth)
+  const { user } = useSelector((state: RootState) => state.auth)
 
   useEffect(() => {
     if (!user) {

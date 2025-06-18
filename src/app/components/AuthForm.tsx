@@ -36,6 +36,7 @@ export default function AuthForm({ setIsLogin, isLogin }: AuthFormProps) {
 
   // Inside the component
   const { data: session } = useSession();
+  console.log(session)
   const router = useRouter();
 
   const handleGoogleLogin = async () => {
@@ -57,8 +58,8 @@ export default function AuthForm({ setIsLogin, isLogin }: AuthFormProps) {
 
     try {
       if (isLogin) {
-        const res: any = await loginUser({ identifier: formData.identifier, password: formData.password }).unwrap();
-        dispatch(loginSuccess({ ...res }))
+        const res = await loginUser({ identifier: formData.identifier, password: formData.password }).unwrap()as LoginResponse;
+        dispatch(loginSuccess(res))
         setMessage(`Logged in successfully with ${formData.identifier}`);
         setMessageType('success');
         router.push("/dashboard");
@@ -73,12 +74,15 @@ export default function AuthForm({ setIsLogin, isLogin }: AuthFormProps) {
         setMessageType('success');
         setIsLogin(true)
       }
-    } catch (error: any) {
-      // If your API returns error messages, you can extract them like this:
-      console.log(error)
-      const errorMsg = error?.data || error?.error || 'Something went wrong';
-      setMessage(errorMsg);
-      setMessageType('error');
+    } catch (error) {
+   
+      if (error instanceof Error) {
+        const err = error as ApiError;
+        const errorMsg = err.data || err.error || err.message || 'Something went wrong';
+        setMessage(errorMsg);
+        setMessageType('error');
+      }
+
     }
     clearMessage();
   };
