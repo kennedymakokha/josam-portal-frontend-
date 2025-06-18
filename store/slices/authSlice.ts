@@ -45,7 +45,13 @@ const authSlice = createSlice({
             };
             state.token = action.payload.token;
         },
-
+        // loginSuccess: (state, action: PayloadAction<{
+        //     token: string | null; id: string; phone_number: string
+        // }>) => {
+        //     state.isAuthenticated = true;
+        //     state.user = action.payload;
+        //     state.token = action?.payload?.token
+        // },
         logout: (state) => {
             state.isAuthenticated = false;
             state.user = null;
