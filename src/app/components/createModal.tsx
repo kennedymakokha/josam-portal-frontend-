@@ -19,12 +19,22 @@ type InputField = {
   options?: InputOption[];
 };
 
+type LoanDetails = {
+  amount: number;
+  interestRate?: number;
+  tenure?: number;
+  pros?: string[];
+  termsAndConditions?: string;
+};
+
 type ServiceData = {
   name: string;
+  _id?: string;
   inputs: InputField[];
   apiEndpoint?: string;
   image?: File | null;
   category?: string;
+  loanDetails?: LoanDetails;
 };
 
 interface ServiceFormModalProps {
@@ -39,7 +49,6 @@ interface ServiceFormModalProps {
 const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
   editMode = false,
   newService,
-
   refetch,
   onClose,
 }) => {
@@ -56,7 +65,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
   ) => {
     const updated = [...localService.inputs];
     (updated[fieldIndex][key] as typeof value) = value;
-    setLocalService({ ...localService, inputs: updated });
+    setLocalService((prev) => ({ ...prev, inputs: updated }));
   };
 
   const handleOptionChange = (
@@ -69,7 +78,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
     const options = updated[fieldIndex].options || [];
     options[optionIndex][key] = value;
     updated[fieldIndex].options = options;
-    setLocalService({ ...localService, inputs: updated });
+    setLocalService((prev) => ({ ...prev, inputs: updated }));
   };
 
   const addInputField = () => {
@@ -92,7 +101,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
     const updated = [...localService.inputs];
     if (!updated[fieldIndex].options) updated[fieldIndex].options = [];
     updated[fieldIndex].options!.push({ label: '', value: '' });
-    setLocalService({ ...localService, inputs: updated });
+    setLocalService((prev) => ({ ...prev, inputs: updated }));
   };
 
   const [updateService] = useUpdateServiceMutation();
@@ -103,8 +112,6 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
       return alert('Service name is required.');
     }
 
-    console.log("Submitting category:", localService.category); // Debug log
-
     const formData = new FormData();
     formData.append('name', localService.name);
     if (localService.apiEndpoint)
@@ -112,10 +119,14 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
     if (localService.image) formData.append('image', localService.image);
     formData.append('category', localService.category || 'uncategorized'); // Ensure always sent
     formData.append('inputs', JSON.stringify(localService.inputs));
+    if (localService.category === 'loan' && localService.loanDetails) {
+      formData.append('loanDetails', JSON.stringify(localService.loanDetails));
+    }
 
     try {
       if (editMode) {
-        await updateService(formData).unwrap();
+        await updateService({ data: formData, _id: localService?._id }).unwrap();
+        refetch();
       } else {
         await submitService(formData).unwrap();
       }
@@ -197,6 +208,142 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
             />
           )}
 
+          {/* Loan Details Section */}
+          {localService.category === 'loan' && (
+            <div className="p-4 bg-gray-100 border rounded space-y-3">
+              <h3 className="font-semibold text-lg">Loan Details</h3>
+
+              <label>
+                Amount
+                <input
+                  type="number"
+                  className="w-full border px-3 py-2 rounded"
+                  value={localService.loanDetails?.amount || ''}
+                  onChange={(e) =>
+                    setLocalService((prev) => ({
+                      ...prev,
+                      loanDetails: {
+                        ...(prev.loanDetails || {}),
+                        amount: Number(e.target.value) || 0,
+                      },
+                    }))
+                  }
+                />
+              </label>
+
+              <label>
+                Interest Rate (%)
+                <input
+                  type="number"
+                  step="0.1"
+                  className="w-full border px-3 py-2 rounded"
+                  value={localService.loanDetails?.interestRate || ''}
+                  onChange={(e) =>
+                    setLocalService((prev) =>
+                    ({
+                      ...prev,
+                      loanDetails: {
+                        ...(prev.loanDetails ?? {}),
+                        interestRate: Number(e.target.value) || 0,
+                      },
+                    } as ServiceData)
+                    )
+                  }
+               
+                />
+              </label>
+
+              <label>
+                Tenure (months)
+                <input
+                  type="number"
+                  className="w-full border px-3 py-2 rounded"
+                  value={localService.loanDetails?.tenure || ''}
+                  onChange={(e) =>
+                    setLocalService((prev) =>
+                    ({
+                      ...prev,
+                      loanDetails: {
+                        ...(prev.loanDetails ?? {}),
+                        tenure: Number(e.target.value) || 0,
+                      },
+                    } as ServiceData)
+                    )
+                  }
+
+                />
+              </label>
+
+              <div>
+                <label className="block font-semibold mb-1">Pros</label>
+                {(localService.loanDetails?.pros || []).map((pro, index) => (
+                  <input
+                    key={index}
+                    type="text"
+                    className="w-full border px-3 py-2 rounded mb-2"
+                    value={pro}
+
+                    onChange={(e) => {
+                      const newPros = [...(localService.loanDetails?.pros || [])];
+                      newPros[index] = e.target.value;
+                      setLocalService((prev) =>
+                        ({
+                          ...prev,
+                          loanDetails: {
+                            ...(prev.loanDetails ?? {}),
+                            pros: newPros,
+                          },
+                        } as ServiceData)
+                     
+                      )
+                    }}
+                  />
+                ))}
+                <button
+                  type="button"
+                  className="text-sm underline text-blue-600"
+                  onClick={() => {
+                    const newPros = [...(localService.loanDetails?.pros || []), ''];
+                    setLocalService((prev) =>
+                      ({
+                        ...prev,
+                        loanDetails: {
+                          ...(prev.loanDetails ?? {}),
+                          pros: newPros,
+                        },
+                      } as ServiceData)
+                  
+                    )
+                  }}
+                >
+                  + Add More Pros
+                </button>
+              </div>
+
+              <label>
+                Terms and Conditions
+                <textarea
+                  rows={4}
+                  className="w-full border px-3 py-2 rounded"
+                  placeholder="Terms and Conditions"
+                  value={localService.loanDetails?.termsAndConditions || ''}
+                  onChange={(e) =>
+                    setLocalService((prev) =>
+                    ({
+                      ...prev,
+                      loanDetails: {
+                        ...(prev.loanDetails ?? {}),
+                        termsAndConditions: e.target.value,
+                      },
+                    } as ServiceData)
+                    )
+                  }
+                
+                />
+              </label>
+            </div>
+          )}
+
           {/* Dynamic Inputs */}
           {localService.inputs.map((input, index) => (
             <div
@@ -206,139 +353,94 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
               <input
                 type="text"
                 className="w-full border px-3 py-2 rounded"
-                placeholder="Input Name"
+                placeholder="Input name"
                 value={input.name}
-                onChange={(e) =>
-                  handleInputChange(index, 'name', e.target.value)
-                }
+                onChange={(e) => handleInputChange(index, 'name', e.target.value)}
               />
-
               <select
                 className="w-full border px-3 py-2 rounded"
                 value={input.type}
                 onChange={(e) =>
-                  handleInputChange(index, 'type', e.target.value)
+                  handleInputChange(index, 'type', e.target.value as InputField['type'])
                 }
               >
                 <option value="text">Text</option>
                 <option value="number">Number</option>
                 <option value="password">Password</option>
-                <option value="selectbox">Selectbox</option>
+                <option value="selectbox">Select Box</option>
                 <option value="radio">Radio</option>
-                <option value="checkbox">Checkbox</option>
                 <option value="date">Date</option>
+                <option value="checkbox">Checkbox</option>
               </select>
-
-              {/* Conditional Inputs */}
-              {input.type === 'date' && (
-                <input
-                  type="date"
-                  className="w-full border px-3 py-2 rounded"
-                  value={input.value}
-                  onChange={(e) =>
-                    handleInputChange(index, 'value', e.target.value)
-                  }
-                />
-              )}
-
-              {input.type === 'checkbox' && (
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={input.value === 'true'}
-                    onChange={(e) =>
-                      handleInputChange(index, 'value', e.target.checked.toString())
-                    }
-                  />
-                  Default Checked
-                </label>
-              )}
-
-              {input.type !== 'selectbox' &&
-                input.type !== 'radio' &&
-                input.type !== 'date' &&
-                input.type !== 'checkbox' && (
-                  <input
-                    type={input.type === 'number' ? 'number' : input.type}
-                    className="w-full border px-3 py-2 rounded"
-                    placeholder="Default Value"
-                    value={input.value}
-                    onChange={(e) =>
-                      handleInputChange(index, 'value', e.target.value)
-                    }
-                  />
-                )}
-
-              <label className="flex items-center gap-2">
+              <input
+                type="text"
+                className="w-full border px-3 py-2 rounded"
+                placeholder="Input value"
+                value={input.value}
+                onChange={(e) => handleInputChange(index, 'value', e.target.value)}
+              />
+              <label className="inline-flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={input.required}
-                  onChange={(e) =>
-                    handleInputChange(index, 'required', e.target.checked)
-                  }
+                  onChange={(e) => handleInputChange(index, 'required', e.target.checked)}
                 />
                 Required
               </label>
 
+              {/* Options for selectbox, radio */}
               {(input.type === 'selectbox' || input.type === 'radio') && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => addOption(index)}
-                    className="text-slate-800 underline text-sm"
-                  >
-                    + Add Option
-                  </button>
-
-                  {input.options?.map((opt, i) => (
-                    <div key={i} className="flex gap-2">
+                <div className="mt-2 space-y-2">
+                  <label className="block font-semibold">Options</label>
+                  {(input.options || []).map((option, idx) => (
+                    <div key={idx} className="flex gap-2 items-center">
                       <input
                         type="text"
+                        className="border px-2 py-1 rounded flex-grow"
                         placeholder="Label"
-                        className="border px-2 py-1 rounded w-1/2"
-                        value={opt.label}
+                        value={option.label}
                         onChange={(e) =>
-                          handleOptionChange(index, i, 'label', e.target.value)
+                          handleOptionChange(index, idx, 'label', e.target.value)
                         }
                       />
                       <input
                         type="text"
+                        className="border px-2 py-1 rounded flex-grow"
                         placeholder="Value"
-                        className="border px-2 py-1 rounded w-1/2"
-                        value={opt.value}
+                        value={option.value}
                         onChange={(e) =>
-                          handleOptionChange(index, i, 'value', e.target.value)
+                          handleOptionChange(index, idx, 'value', e.target.value)
                         }
                       />
                     </div>
                   ))}
-                </>
+                  <button
+                    type="button"
+                    className="text-sm underline text-blue-600"
+                    onClick={() => addOption(index)}
+                  >
+                    + Add Option
+                  </button>
+                </div>
               )}
             </div>
           ))}
 
           <button
             type="button"
-            className="text-slate-800 underline"
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
             onClick={addInputField}
           >
-            Add Field
+            + Add Input Field
           </button>
 
-          <div className="flex justify-end gap-3 mt-4">
-            <button
-              className="px-4 py-2 border border-gray-300 rounded"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-            <button
-              className="px-4 py-2 bg-slate-800 text-white rounded"
-              onClick={handleSave}
-            >
-              {editMode ? 'Update Service' : 'Save Service'}
-            </button>
-          </div>
+          <button
+            type="button"
+            className="mt-6 w-full bg-green-600 text-white py-3 rounded"
+            onClick={handleSave}
+          >
+            {editMode ? 'Update Service' : 'Create Service'}
+          </button>
         </div>
       </div>
     </div>
