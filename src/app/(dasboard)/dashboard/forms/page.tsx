@@ -8,6 +8,7 @@ interface Service {
     name: string;
     inputs: any[];
     apiEndpoint: string;
+
     image: string | null;
     active?: boolean;
 }
@@ -173,7 +174,7 @@ export default function ServiceTable() {
                         <div>
                             <strong>Form Image:</strong>
                             <div className="mt-2">
-                                  {option.image ? (
+                                {option.image ? (
                                     typeof option.image === 'string' ? (
                                         // If it's a URL string (e.g., from backend)
                                         <Image width={100} height={100} src={option.image} alt="" className="w-32 h-32 object-cover rounded border" />

@@ -3,17 +3,17 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { generateSecretKey } from '../../../utils/keygen';
-// import { useUpdateKeyMutation } from '../../../store/features/authApi';
+import { useUpdateKeyMutation } from '../../../store/features/authApi';
 
 export default function SecretKeyCard() {
     const [key, setKey] = useState('');
     const [copied, setCopied] = useState(false);
-    // const [upateKey] = useUpdateKeyMutation()
+    const [upateKey] = useUpdateKeyMutation()
     const handleCopy = async () => {
         if (!key) return;
         try {
             await navigator.clipboard.writeText(key);
-            // await upateKey({ secret_key: key }).unwrap()
+            await upateKey({ secret_key: key }).unwrap()
             setCopied(true);
             setTimeout(() => { setCopied(false); setKey('') }, 2000); // Reset after 2s
         } catch (err) {

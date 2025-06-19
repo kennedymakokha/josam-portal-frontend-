@@ -24,7 +24,7 @@ type ServiceData = {
   inputs: InputField[];
   apiEndpoint?: string;
   image?: File | null;
-  category?: string; // <-- Added category field
+  category?: string;
 };
 
 interface ServiceFormModalProps {
@@ -39,6 +39,7 @@ interface ServiceFormModalProps {
 const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
   editMode = false,
   newService,
+  setNewService,
   refetch,
   onClose,
 }) => {
@@ -102,13 +103,14 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
       return alert('Service name is required.');
     }
 
+    console.log("Submitting category:", localService.category); // Debug log
+
     const formData = new FormData();
     formData.append('name', localService.name);
     if (localService.apiEndpoint)
       formData.append('apiEndpoint', localService.apiEndpoint);
     if (localService.image) formData.append('image', localService.image);
-    if (localService.category)
-      formData.append('category', localService.category); // <-- Appending category
+    formData.append('category', localService.category || 'uncategorized'); // Ensure always sent
     formData.append('inputs', JSON.stringify(localService.inputs));
 
     try {
@@ -126,7 +128,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
   };
 
   return (
-    <div className="fixed text-black inset-0  bg-gradient-to-tr from-slate-900 via-slate-600 to-slate-700 opacity-96 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="fixed text-black inset-0 bg-gradient-to-tr from-slate-900 via-slate-600 to-slate-700 opacity-96 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-white max-w-2xl w-full p-6 rounded-lg shadow-xl overflow-y-auto max-h-[90vh] relative">
         <button
           onClick={onClose}
@@ -135,7 +137,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
           &times;
         </button>
         <h2 className="text-2xl font-semibold mb-4">
-          {editMode ? 'Edit Service' : `Create ${localService.category !== undefined ? localService.category : ""} form`}
+          {editMode ? 'Edit Service' : `Create ${localService.category || ''} Form`}
         </h2>
 
         <div className="space-y-4">
@@ -143,7 +145,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
           <input
             type="text"
             className="w-full border px-3 py-2 rounded"
-            placeholder={`${localService.category ? localService.category : "form"} name`}
+            placeholder={`${localService.category || 'form'} name`}
             value={localService.name}
             onChange={(e) =>
               setLocalService((prev) => ({ ...prev, name: e.target.value }))
@@ -164,9 +166,6 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
             <option value="">Select Category</option>
             <option value="service">Service</option>
             <option value="loan">Loan</option>
-            {/* <option value="healthcare">Healthcare</option>
-            <option value="technology">Technology</option>
-            <option value="other">Other</option> */}
           </select>
 
           {/* API Endpoint */}
@@ -184,17 +183,19 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
           />
 
           {/* Image Upload */}
-          {localService.category === "service" && <input
-            type="file"
-            accept="image/*"
-            className="w-full border px-3 py-2 rounded"
-            onChange={(e) =>
-              setLocalService((prev) => ({
-                ...prev,
-                image: e.target.files?.[0] || null,
-              }))
-            }
-          />}
+          {localService.category === 'service' && (
+            <input
+              type="file"
+              accept="image/*"
+              className="w-full border px-3 py-2 rounded"
+              onChange={(e) =>
+                setLocalService((prev) => ({
+                  ...prev,
+                  image: e.target.files?.[0] || null,
+                }))
+              }
+            />
+          )}
 
           {/* Dynamic Inputs */}
           {localService.inputs.map((input, index) => (
@@ -321,7 +322,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
             className="text-slate-800 underline"
             onClick={addInputField}
           >
-           Add Field
+            Add Field
           </button>
 
           <div className="flex justify-end gap-3 mt-4">
