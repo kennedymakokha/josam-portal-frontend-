@@ -1,23 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDeleteServiceMutation, useGetServicesQuery, useToggleactiveServiceMutation } from '../../../../../store/features/serviceApi';
-
-interface Service {
-    _id?: string; // Add the missing _id property
-    name: string;
-    inputs: any[];
-    apiEndpoint: string;
-
-    image: string | null;
-    active?: boolean;
-}
-
-
 import ServiceFormModal from '@/app/components/createModal';
 import PreviewModal from '@/app/components/previewModal';
 import ConfirmActionModal from '@/app/components/confirmactionModal';
 import Image from 'next/image';
+
+interface Service {
+    _id?: string;
+    name: string;
+    inputs: any[];
+    apiEndpoint: string;
+    image: string | null;
+    active?: boolean;
+    category?: string; // Added for filtering
+}
 
 export default function ServiceTable() {
     const [submit] = useToggleactiveServiceMutation();
@@ -30,6 +28,7 @@ export default function ServiceTable() {
             error: result.error,
         }),
     });
+
     const [options, setOptions] = useState<any[]>([]);
     const [selectedOption, setSelectedOption] = useState<any | null>(null);
     const [formData, setFormData] = useState<Record<string, string>>({});
@@ -45,7 +44,15 @@ export default function ServiceTable() {
         inputs: [],
         apiEndpoint: '',
         image: null,
+        category: '',
     });
+
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+
+    // Category Filter
+    const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
     const handleInputChange = (name: string, value: string) => {
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -58,51 +65,45 @@ export default function ServiceTable() {
         setConfirmAction(() => async () => {
             try {
                 await deleteService(option._id).unwrap();
-                refetch(); // Re-fetch data after successful status update
+                refetch();
             } catch (error) {
-                console.error('Error toggling service status:', error);
+                console.error('Error deleting service:', error);
             } finally {
-                setShowConfirmModal(false); // Close modal whether success or error
+                setShowConfirmModal(false);
             }
-            setShowConfirmModal(false);
         });
         setShowConfirmModal(true);
     };
+
     const handleToggleStatus = (option: Service) => {
         const action = option.active ? 'Deactivate' : 'Activate';
-
-        // Set up the confirmation modal text
         setConfirmTitle(`${action} ${option.name}?`);
-        setConfirmDescription(`This will ${action?.toLowerCase()} the service.`);
-        setConfirmDanger(false); // Set to true if you want red-styled modal for destructive actions
-
-        // Define what happens on confirm
+        setConfirmDescription(`This will ${action.toLowerCase()} the service.`);
+        setConfirmDanger(false);
         setConfirmAction(() => async () => {
             try {
                 await submit(option._id).unwrap();
-                refetch(); // Re-fetch data after successful status update
+                refetch();
             } catch (error) {
                 console.error('Error toggling service status:', error);
             } finally {
-                setShowConfirmModal(false); // Close modal whether success or error
+                setShowConfirmModal(false);
             }
         });
-
-        // Show the modal
         setShowConfirmModal(true);
     };
-
-
 
     const handleEdit = (option: Service) => {
         setEditMode(true);
         setNewService(option);
         setShowCreateModal(true);
     };
+
     const handleSubmit = () => {
         alert(`Submitted form data:\n` + JSON.stringify(formData, null, 2));
         setSelectedOption(null);
     };
+
     const services = data?.services || options;
     const parsedServices = services.map((option) => {
         const parsedInputs =
@@ -112,23 +113,54 @@ export default function ServiceTable() {
         return { ...option, inputs: parsedInputs };
     });
 
+    // Categories
+    const categories = ['All', ...Array.from(new Set(parsedServices.map((s) => s.category || 'Uncategorized')))];
+
+    // Filter + Paginate
+    const filteredServices = selectedCategory === 'All'
+        ? parsedServices
+        : parsedServices.filter((s) => (s.category || 'Uncategorized') === selectedCategory);
+
+    const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
+    const paginatedServices = filteredServices.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    useEffect(() => {
+        setCurrentPage(1); // Reset page on data/filter change
+    }, [parsedServices.length, selectedCategory]);
+
     return (
         <div className="space-y-10 text-black p-4 bg-gray-100 min-h-screen">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <h1 className="text-2xl font-bold">My forms</h1>
-                <button
-                    onClick={() => {
-                        setEditMode(false);
-                        setNewService({ name: '', inputs: [], image: null, apiEndpoint: '' });
-                        setShowCreateModal(true);
-                    }}
-                    className="bg-green-600 text-white px-4 py-2 rounded"
-                >
-                    + Add Form
-                </button>
+                <div className="flex gap-4 items-center">
+                    <label htmlFor="category" className="font-medium">Filter by Category:</label>
+                    <select
+                        id="category"
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="px-3 py-2 border rounded bg-white"
+                    >
+                        {categories.map((cat) => (
+                            <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                    </select>
+                    <button
+                        onClick={() => {
+                            setEditMode(false);
+                            setNewService({ name: '', inputs: [], image: null, apiEndpoint: '', category: '' });
+                            setShowCreateModal(true);
+                        }}
+                        className="bg-green-600 text-white px-4 py-2 rounded"
+                    >
+                        + Add Form
+                    </button>
+                </div>
             </div>
 
-            {parsedServices.map((option: Service) => (
+            {paginatedServices.map((option: Service) => (
                 <div key={option._id} className="bg-white rounded-lg shadow-md p-6 mb-6">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-bold">{option.name} Form</h2>
@@ -164,22 +196,18 @@ export default function ServiceTable() {
                     </div>
 
                     <div className="space-y-4 text-sm">
-                        {/* API Endpoint Row */}
                         <div>
                             <strong>API Endpoint:</strong>{' '}
                             <span className="text-gray-700">{option.apiEndpoint || <em className="text-gray-400">N/A</em>}</span>
                         </div>
 
-                        {/* Image Preview Row */}
                         <div>
                             <strong>Form Image:</strong>
                             <div className="mt-2">
                                 {option.image ? (
                                     typeof option.image === 'string' ? (
-                                        // If it's a URL string (e.g., from backend)
                                         <Image width={100} height={100} src={option.image} alt="" className="w-32 h-32 object-cover rounded border" />
                                     ) : (
-                                        // If it's a File object (local preview)
                                         <Image height={1000} width={100} src={URL.createObjectURL(option.image)} alt="Preview" className="w-32 h-32 object-cover rounded border" />
                                     )
                                 ) : (
@@ -188,7 +216,11 @@ export default function ServiceTable() {
                             </div>
                         </div>
 
-                        {/* Inputs Table */}
+                        <div>
+                            <strong>Category:</strong>{' '}
+                            <span className="text-gray-700">{option.category || <em className="text-gray-400">Uncategorized</em>}</span>
+                        </div>
+
                         <table className="w-full table-auto border-collapse">
                             <thead className="bg-gray-200 text-black">
                                 <tr>
@@ -231,12 +263,31 @@ export default function ServiceTable() {
                             </tbody>
                         </table>
                     </div>
-
                 </div>
             ))}
 
-            {/* Modals */}
+            {/* Pagination Controls */}
+            <div className="flex justify-center items-center mt-6 gap-2">
+                <button
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+                >
+                    Previous
+                </button>
+                <span className="px-4 py-2">
+                    Page {currentPage} of {totalPages}
+                </span>
+                <button
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+                >
+                    Next
+                </button>
+            </div>
 
+            {/* Modals */}
             {selectedOption && (
                 <PreviewModal
                     service={selectedOption}
@@ -268,6 +319,7 @@ export default function ServiceTable() {
                     }}
                 />
             )}
+
             {showConfirmModal && confirmAction && (
                 <ConfirmActionModal
                     title={confirmTitle}

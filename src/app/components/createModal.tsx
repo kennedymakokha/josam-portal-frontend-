@@ -152,16 +152,6 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
         </h2>
 
         <div className="space-y-4">
-          {/* Service Name */}
-          <input
-            type="text"
-            className="w-full border px-3 py-2 rounded"
-            placeholder={`${localService.category || 'form'} name`}
-            value={localService.name}
-            onChange={(e) =>
-              setLocalService((prev) => ({ ...prev, name: e.target.value }))
-            }
-          />
 
           {/* Category Selector */}
           <select
@@ -178,6 +168,17 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
             <option value="service">Service</option>
             <option value="loan">Loan</option>
           </select>
+
+          {/* Service Name */}
+          <input
+            type="text"
+            className="w-full border px-3 py-2 rounded"
+            placeholder={`${localService.category || 'form'} name`}
+            value={localService.name}
+            onChange={(e) =>
+              setLocalService((prev) => ({ ...prev, name: e.target.value }))
+            }
+          />
 
           {/* API Endpoint */}
           <input
@@ -249,7 +250,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
                     } as ServiceData)
                     )
                   }
-               
+
                 />
               </label>
 
@@ -287,14 +288,14 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
                       const newPros = [...(localService.loanDetails?.pros || [])];
                       newPros[index] = e.target.value;
                       setLocalService((prev) =>
-                        ({
-                          ...prev,
-                          loanDetails: {
-                            ...(prev.loanDetails ?? {}),
-                            pros: newPros,
-                          },
-                        } as ServiceData)
-                     
+                      ({
+                        ...prev,
+                        loanDetails: {
+                          ...(prev.loanDetails ?? {}),
+                          pros: newPros,
+                        },
+                      } as ServiceData)
+
                       )
                     }}
                   />
@@ -305,14 +306,14 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
                   onClick={() => {
                     const newPros = [...(localService.loanDetails?.pros || []), ''];
                     setLocalService((prev) =>
-                      ({
-                        ...prev,
-                        loanDetails: {
-                          ...(prev.loanDetails ?? {}),
-                          pros: newPros,
-                        },
-                      } as ServiceData)
-                  
+                    ({
+                      ...prev,
+                      loanDetails: {
+                        ...(prev.loanDetails ?? {}),
+                        pros: newPros,
+                      },
+                    } as ServiceData)
+
                     )
                   }}
                 >
@@ -338,7 +339,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
                     } as ServiceData)
                     )
                   }
-                
+
                 />
               </label>
             </div>
