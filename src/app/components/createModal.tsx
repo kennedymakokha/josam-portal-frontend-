@@ -24,6 +24,7 @@ type ServiceData = {
   inputs: InputField[];
   apiEndpoint?: string;
   image?: File | null;
+  category?: string; // <-- Added category field
 };
 
 interface ServiceFormModalProps {
@@ -106,7 +107,8 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
     if (localService.apiEndpoint)
       formData.append('apiEndpoint', localService.apiEndpoint);
     if (localService.image) formData.append('image', localService.image);
-
+    if (localService.category)
+      formData.append('category', localService.category); // <-- Appending category
     formData.append('inputs', JSON.stringify(localService.inputs));
 
     try {
@@ -124,7 +126,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
   };
 
   return (
-    <div className="fixed text-black inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="fixed text-black inset-0  bg-gradient-to-tr from-slate-900 via-slate-600 to-slate-700 opacity-96 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-white max-w-2xl w-full p-6 rounded-lg shadow-xl overflow-y-auto max-h-[90vh] relative">
         <button
           onClick={onClose}
@@ -133,20 +135,41 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
           &times;
         </button>
         <h2 className="text-2xl font-semibold mb-4">
-          {editMode ? 'Edit Service' : 'Create New Service'}
+          {editMode ? 'Edit Service' : `Create ${localService.category !== undefined ? localService.category : ""} form`}
         </h2>
 
         <div className="space-y-4">
+          {/* Service Name */}
           <input
             type="text"
             className="w-full border px-3 py-2 rounded"
-            placeholder="Service Name"
+            placeholder={`${localService.category ? localService.category : "form"} name`}
             value={localService.name}
             onChange={(e) =>
               setLocalService((prev) => ({ ...prev, name: e.target.value }))
             }
           />
 
+          {/* Category Selector */}
+          <select
+            className="w-full border px-3 py-2 rounded"
+            value={localService.category || ''}
+            onChange={(e) =>
+              setLocalService((prev) => ({
+                ...prev,
+                category: e.target.value,
+              }))
+            }
+          >
+            <option value="">Select Category</option>
+            <option value="service">Service</option>
+            <option value="loan">Loan</option>
+            {/* <option value="healthcare">Healthcare</option>
+            <option value="technology">Technology</option>
+            <option value="other">Other</option> */}
+          </select>
+
+          {/* API Endpoint */}
           <input
             type="text"
             className="w-full border px-3 py-2 rounded"
@@ -160,7 +183,8 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
             }
           />
 
-          <input
+          {/* Image Upload */}
+          {localService.category === "service" && <input
             type="file"
             accept="image/*"
             className="w-full border px-3 py-2 rounded"
@@ -170,8 +194,9 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
                 image: e.target.files?.[0] || null,
               }))
             }
-          />
+          />}
 
+          {/* Dynamic Inputs */}
           {localService.inputs.map((input, index) => (
             <div
               key={index}
@@ -203,7 +228,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
                 <option value="date">Date</option>
               </select>
 
-              {/* Field Renderers */}
+              {/* Conditional Inputs */}
               {input.type === 'date' && (
                 <input
                   type="date"
@@ -259,7 +284,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
                   <button
                     type="button"
                     onClick={() => addOption(index)}
-                    className="text-blue-600 underline text-sm"
+                    className="text-slate-800 underline text-sm"
                   >
                     + Add Option
                   </button>
@@ -293,10 +318,10 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
 
           <button
             type="button"
-            className="text-blue-600 underline"
+            className="text-slate-800 underline"
             onClick={addInputField}
           >
-            + Add Field
+           Add Field
           </button>
 
           <div className="flex justify-end gap-3 mt-4">
@@ -307,7 +332,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
               Cancel
             </button>
             <button
-              className="px-4 py-2 bg-green-600 text-white rounded"
+              className="px-4 py-2 bg-slate-800 text-white rounded"
               onClick={handleSave}
             >
               {editMode ? 'Update Service' : 'Save Service'}

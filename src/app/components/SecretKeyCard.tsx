@@ -13,7 +13,7 @@ export default function SecretKeyCard() {
         if (!key) return;
         try {
             await navigator.clipboard.writeText(key);
-            await upateKey({ secret_key: key }).unwrap()
+            // await upateKey({ secret_key: key }).unwrap()
             setCopied(true);
             setTimeout(() => { setCopied(false); setKey('') }, 2000); // Reset after 2s
         } catch (err) {

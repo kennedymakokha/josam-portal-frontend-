@@ -34,7 +34,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
     onSubmit,
 }) => {
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gradient-to-tr from-slate-900 via-slate-600 to-slate-700 opacity-96 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-white w-full max-w-lg p-6 rounded-xl shadow-lg relative">
                 <button
                     className="absolute top-3 right-4 text-gray-500 hover:text-black text-2xl font-bold"
@@ -111,7 +111,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-blue-600 text-white rounded"
+                            className="px-4 py-2 bg-slate-800 text-white rounded"
                         >
                             Submit
                         </button>
