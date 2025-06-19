@@ -30,7 +30,7 @@ type ServiceData = {
 interface ServiceFormModalProps {
   editMode?: boolean;
   newService: ServiceData;
-  setNewService: React.Dispatch<React.SetStateAction<ServiceData>>;
+  // setNewService: React.Dispatch<React.SetStateAction<ServiceData>>;
   onClose: () => void;
   onSave: (service: ServiceData) => void;
   refetch: () => void;
@@ -39,7 +39,7 @@ interface ServiceFormModalProps {
 const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
   editMode = false,
   newService,
-  setNewService,
+  // setNewService,
   refetch,
   onClose,
 }) => {
