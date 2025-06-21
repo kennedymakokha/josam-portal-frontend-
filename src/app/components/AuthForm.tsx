@@ -16,6 +16,7 @@ export default function AuthForm({ setIsLogin, isLogin }: AuthFormProps) {
   const [formData, setFormData] = useState({
     identifier: '',
     password: '',
+    fcm_token:"fSUKQBQSTnOU6Vn7aygyPw:APA91bHFRWNbsOCj6Vdrri4QY-NBZz-H4ZhmzKVlJu6EoI9kYWP6nY2cgP9WI0MIOhn8FLmGjiMzLYg1CbMmpfdJbxHoeteJKCSieSu_xvf8ZMOQekgg09Y",
     name: '',
     phone_number: '',
     email: '',
@@ -35,8 +36,8 @@ export default function AuthForm({ setIsLogin, isLogin }: AuthFormProps) {
   };
 
   // Inside the component
-  const { data: session } = useSession();
-  console.log(session)
+  // const { data: session } = useSession();
+  // console.log(session)
   const router = useRouter();
 
   const handleGoogleLogin = async () => {
@@ -58,7 +59,7 @@ export default function AuthForm({ setIsLogin, isLogin }: AuthFormProps) {
 
     try {
       if (isLogin) {
-        const res = await loginUser({ identifier: formData.identifier, password: formData.password }).unwrap()as LoginResponse;
+        const res = await loginUser({fcm_token:formData.fcm_token, identifier: formData.identifier, password: formData.password }).unwrap()as LoginResponse;
         dispatch(loginSuccess(res))
         setMessage(`Logged in successfully with ${formData.identifier}`);
         setMessageType('success');
