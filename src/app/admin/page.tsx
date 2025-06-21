@@ -7,6 +7,7 @@ import {
     useRegisterThemeMutation,
 } from '../../../store/features/appApi';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 type Theme = {
     primaryColor: string;
     tagline: string;
@@ -101,7 +102,9 @@ export default function AdminPage() {
                                     </td>
                                     <td className="py-2 px-4">
                                         {app.logo ? (
-                                            <img
+                                            <Image
+                                                height={400}
+                                                width={200}
                                                 src={app.logo}
                                                 alt="Logo"
                                                 className="w-10 h-10 object-contain"
@@ -191,7 +194,9 @@ export default function AdminPage() {
                                     onChange={handleLogoUpload}
                                 />
                                 {logo && (
-                                    <img
+                                    <Image
+                                        height={200}
+                                        width={200}
                                         src={logo}
                                         alt="Preview Logo"
                                         className="w-20 h-20 mt-2 object-contain border rounded"
