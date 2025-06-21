@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLoginMutation, useSignupMutation } from '../../../store/features/authApi';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { loginSuccess } from '../../../store/slices/authSlice';
 import { useDispatch } from 'react-redux';
