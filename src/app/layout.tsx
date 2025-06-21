@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Toaster } from 'sonner';
 import { persistor, store } from "../../store/store";
 import { Providers } from "./providers";
+import { ThemeProvider } from "../../context/themeContext";
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -21,14 +22,17 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body>   <Provider store={store}>
-        {isMounted ? (
-          <PersistGate loading={null} persistor={persistor}>
-            <Providers>{children}</Providers>
-            <Toaster richColors position="top-right" />
-          </PersistGate>
-        ) : null}
-      </Provider>
+      <body>
+        <ThemeProvider>
+          <Provider store={store}>
+            {isMounted ? (
+              <PersistGate loading={null} persistor={persistor}>
+                <Providers>{children}</Providers>
+                <Toaster richColors position="top-right" />
+              </PersistGate>
+            ) : null}
+          </Provider>
+        </ThemeProvider>
       </body>
     </html>
   );
