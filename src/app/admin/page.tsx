@@ -12,6 +12,7 @@ type Theme = {
     primaryColor: string;
     tagline: string;
     app_name: string;
+    _id?: string
     logo: string | null;
 };
 export default function AdminPage() {
@@ -90,7 +91,7 @@ export default function AdminPage() {
                     </thead>
                     <tbody>
                         {apps?.length > 0 ? (
-                            apps.map((app: any) => (
+                            apps.map((app: Theme) => (
                                 <tr key={app._id} className="border-t">
                                     <td className="py-2 px-4">{app.app_name}</td>
                                     <td className="py-2 px-4">{app.tagline}</td>

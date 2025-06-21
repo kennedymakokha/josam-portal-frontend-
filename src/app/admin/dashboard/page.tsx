@@ -31,7 +31,7 @@ export default function Home() {
     setTagline(theme.tagline);
     setLogo(theme.logo);
     setAppname(theme.app_name);
-  }, [theme]);
+  }, [theme,setAppname,setPrimaryColor,setLogo,setTagline]);
 
   return (
     <div
