@@ -3,6 +3,7 @@ import { useContext, useEffect } from 'react';
 import { ThemeContext } from '../../../../context/themeContext';
 import { useSearchParams } from 'next/navigation';
 import { useGetThemeQuery } from '../../../../store/features/appApi';
+import Image from 'next/image';
 
 export default function Home() {
   const searchParams = useSearchParams();
@@ -31,7 +32,7 @@ export default function Home() {
     setTagline(theme.tagline);
     setLogo(theme.logo);
     setAppname(theme.app_name);
-  }, [theme,setAppname,setPrimaryColor,setLogo,setTagline]);
+  }, [theme, setAppname, setPrimaryColor, setLogo, setTagline]);
 
   return (
     <div
@@ -39,7 +40,9 @@ export default function Home() {
       className="flex flex-col items-center justify-center min-h-screen p-8"
     >
       {logo && (
-        <img
+        <Image
+          height={160}
+          width={160}
           src={logo}
           alt="Logo"
           className="w-40 h-40 object-contain mb-4"
