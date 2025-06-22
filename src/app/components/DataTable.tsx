@@ -4,6 +4,7 @@ import React from 'react';
 type Column<Data> = {
     key: keyof Data;
     label?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     render?: (value: any, row: Data) => React.ReactNode;
 };
 

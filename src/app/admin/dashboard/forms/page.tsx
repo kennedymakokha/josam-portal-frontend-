@@ -15,17 +15,44 @@ import {
 } from '../../../../../store/features/serviceApi';
 import { skipToken } from '@reduxjs/toolkit/query';
 
-export interface Service {
+export type InputOption = {
+    label: string;
+    value: string;
+};
+interface RawService {
     _id?: string;
     name: string;
-    inputs: any[];
+    inputs: string[] | InputField[]; // could be either
     app_name: string;
     apiEndpoint: string;
     image?: File | string | null;
     active?: boolean;
     category?: string;
 }
-
+export type InputField = {
+    name: string;
+    type: 'text' | 'number' | 'password' | 'selectbox' | 'radio' | 'date' | 'checkbox';
+    value: string | number | boolean;
+    required: boolean;
+    options?: InputOption[]; // only for selectbox or radio
+};
+export interface Service {
+    _id?: string;
+    name: string;
+    inputs: InputField[];
+    app_name: string;
+    apiEndpoint: string;
+    image?: File | string | null;
+    active?: boolean;
+    category?: string;
+}
+function isInputsStringArray(inputs: unknown): inputs is string[] {
+    return (
+        Array.isArray(inputs) &&
+        inputs.length > 0 &&
+        typeof inputs[0] === 'string'
+    );
+}
 // Handle either File or string URL image values
 function ImageCell({ val }: { val: string | File | null | undefined }) {
     const [objectUrl, setObjectUrl] = useState<string | null>(null);
@@ -60,7 +87,7 @@ export default function ServiceManagerPage() {
     const [toggleService] = useToggleactiveServiceMutation();
     const [selectedService, setSelectedService] = useState<Service | null>(null);
     const [appName, setAppName] = useState<string | null>(null);
-
+    console.log(selectedService)
     useEffect(() => {
         if (typeof window !== 'undefined') {
             setAppName(localStorage.getItem('app_name'));
@@ -70,13 +97,25 @@ export default function ServiceManagerPage() {
     const { data, refetch, isFetching } = useGetServicesQuery(
         appName ? { name: appName } : skipToken // <-- only fetch if appName is available
     );
-    const servicesData: Service[] = (data as any)?.services?.map((s: Service) => ({
-        ...s,
-        inputs:
-            typeof s.inputs?.[0] === 'string'
-                ? JSON.parse(s.inputs[0])
-                : s.inputs,
-    })) || [];
+    const servicesData: Service[] = (data as { services?: RawService[] })?.services?.map((s) => {
+        let parsedInputs: InputField[] = [];
+
+        if (isInputsStringArray(s.inputs)) {
+            try {
+                parsedInputs = JSON.parse(s.inputs[0]) as InputField[];
+            } catch {
+                parsedInputs = [];
+                console.error('Failed to parse inputs for service:', s.name);
+            }
+        } else {
+            parsedInputs = s.inputs as InputField[];
+        }
+
+        return {
+            ...s,
+            inputs: parsedInputs,
+        };
+    }) ?? [];
 
     // States for modals and table
     const [showFormModal, setShowFormModal] = useState(false);
