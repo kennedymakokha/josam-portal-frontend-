@@ -58,10 +58,7 @@ export default function AdminPage() {
             if (logoFile) {
                 formData.append('logo', logoFile);
             }
-
-            const response = await submit(formData).unwrap();
-
-
+            await submit(formData).unwrap();
             setIsModalOpen(false);
             await refetch();
             router.push(`/admin/dashboard?name=${app_name}`);
