@@ -2,14 +2,10 @@
 
 import { useContext, ChangeEvent, useState } from 'react';
 import { ThemeContext } from '../../../context/themeContext';
-import {
-    useGetThemeQuery,
-    useRegisterThemeMutation,
-} from '../../../store/features/appApi';
+import { useGetThemeQuery, useRegisterThemeMutation } from '../../../store/features/appApi';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import DataTable from '../components/DataTable';
-// ✅ import your DataTable component
 
 type Theme = {
     primaryColor: string;
@@ -32,17 +28,17 @@ export default function AdminPage() {
     } = useContext(ThemeContext);
 
     const router = useRouter();
+    const { data: apps, refetch } = useGetThemeQuery<{ data: Theme[] }>({ name: 'all' });
     const [submit, { isLoading: saving }] = useRegisterThemeMutation();
-    const { data: apps, refetch, } = useGetThemeQuery<{ data: Theme[] }>({ name: 'all' });
-
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [logoFile, setLogoFile] = useState<File | null>(null);
+
 
     const handleLogoUpload = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => setLogo(reader.result as string);
-            reader.readAsDataURL(file);
+            setLogoFile(file);
+            setLogo(URL.createObjectURL(file)); // Preview only
         }
     };
 
@@ -52,42 +48,58 @@ export default function AdminPage() {
             return;
         }
 
+
+
         try {
-            await submit({
-                primaryColor,
-                tagline,
-                logo,
-                app_name,
-            }).unwrap();
+            const formData = new FormData();
+            formData.append('app_name', app_name);
+            formData.append('primaryColor', primaryColor);
+            formData.append('tagline', tagline);
+            if (logoFile) {
+                formData.append('logo', logoFile);
+            }
+
+            const response = await submit(formData).unwrap();
+
 
             setIsModalOpen(false);
             await refetch();
-            router.push(`/admin/dashboard?name=${app_name}`)
-            // router.refresh();
+            router.push(`/admin/dashboard?name=${app_name}`);
         } catch (error) {
             console.error('Theme save failed:', error);
             alert('An error occurred while saving the theme.');
         }
     };
-
+    const handleopenModal = () => {
+        setIsModalOpen(true);
+        setAppname('');
+        setPrimaryColor('#000000');
+        setTagline('');
+        setLogo(null);
+        setLogoFile(null);
+    }
+    const handlecloseModal = () => {
+        setIsModalOpen(false);
+        setAppname('');
+        setPrimaryColor('#000000');
+        setTagline('');
+        setLogo(null);
+        setLogoFile(null);
+    };
     return (
-        // <div className="p-8 max-w-5xl bg-slate-50 mx-auto">
-        <div className="min-h-screen p-8 text-white  mx-auto bg-gradient-to-tr from-slate-900 via-slate-600 to-slate-700 ">
-
+        <div className="min-h-screen p-8 text-white mx-auto bg-gradient-to-tr from-slate-900 via-slate-600 to-slate-700">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold">Your Applications</h1>
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => handleopenModal()}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow"
                 >
                     + Add New App
                 </button>
             </div>
 
-            {/* DataTable rendering */}
             {apps?.length ? (
                 <DataTable<Theme>
-                    // loading={LoadingData}
                     data={apps}
                     columns={[
                         { key: 'app_name', label: 'App Name' },
@@ -121,30 +133,38 @@ export default function AdminPage() {
                     ]}
                     actions={[
                         {
-                            // label: 'Edit',
-                            icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                            </svg>,
-
-                            onClick: (row) => { router.push(`/admin/dashboard`); setAppname(row.app_name); setPrimaryColor(row.primaryColor); setTagline(row.tagline); setLogo(row.logo || null); localStorage.setItem('app_name', row.app_name); },
+                            icon: (
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                </svg>
+                            ),
+                            onClick: (row) => {
+                                router.push(`/admin/dashboard`);
+                                setAppname(row.app_name);
+                                setPrimaryColor(row.primaryColor);
+                                setTagline(row.tagline);
+                                setLogo(row.logo || null);
+                                localStorage.setItem('app_name', row.app_name);
+                            },
                             className: 'text-white/20 border border-white rounded p-1 flex items-center justify-center',
                         },
                         {
-                            icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                            </svg>
-                            ,
+                            icon: (
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                </svg>
+                            ),
                             onClick: (row) =>
                                 router.push(`/admin/dashboard?name=${row.app_name}`),
-                            className: 'text-blue-600  border border-white/20 bg-slate-200 rounded p-1 flex items-center justify-center',
+                            className: 'text-blue-600 border border-white/20 bg-slate-200 rounded p-1 flex items-center justify-center',
                         },
                         {
-                            icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                            </svg>
-
-                            ,
+                            icon: (
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
+                            ),
                             onClick: (row) =>
                                 router.push(`/admin/dashboard?name=${row.app_name}`),
                             className: 'text-white border border-white/20 bg-red-500 rounded p-1 flex items-center justify-center',
@@ -156,7 +176,6 @@ export default function AdminPage() {
                 <p className="text-center text-gray-500">No apps found.</p>
             )}
 
-            {/* Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 text-black bg-gradient-to-tr from-slate-900 via-slate-600 to-slate-700 flex items-center justify-center">
                     <div className="bg-white rounded-lg p-6 w-full max-w-lg shadow-lg relative">
@@ -170,7 +189,6 @@ export default function AdminPage() {
                         <h2 className="text-xl font-bold mb-4">Add New App</h2>
 
                         <div className="space-y-4">
-                            {/* App Name */}
                             <div>
                                 <label className="block text-sm font-medium mb-1">App Name</label>
                                 <input
@@ -182,7 +200,6 @@ export default function AdminPage() {
                                 />
                             </div>
 
-                            {/* Primary Color */}
                             <div>
                                 <label className="block text-sm font-medium mb-1">Primary Color</label>
                                 <input
@@ -193,7 +210,6 @@ export default function AdminPage() {
                                 />
                             </div>
 
-                            {/* Tagline */}
                             <div>
                                 <label className="block text-sm font-medium mb-1">Tagline</label>
                                 <input
@@ -205,7 +221,6 @@ export default function AdminPage() {
                                 />
                             </div>
 
-                            {/* Logo Upload */}
                             <div>
                                 <label className="block text-sm font-medium mb-1">Logo</label>
                                 <input
@@ -214,17 +229,25 @@ export default function AdminPage() {
                                     onChange={handleLogoUpload}
                                 />
                                 {logo && (
-                                    <Image
-                                        height={200}
-                                        width={200}
-                                        src={logo}
-                                        alt="Preview Logo"
-                                        className="w-20 h-20 mt-2 object-contain border rounded"
-                                    />
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex border  size-32 items-center justify-between">
+                                            <span className="text-sm text-gray-700">
+                                                {logoFile ? <Image
+                                                    height={200}
+                                                    width={200}
+                                                    src={logo}
+                                                    alt="Preview Logo"
+                                                    className="size-28 mt-2 object-contain border rounded"
+                                                /> : 'No logo uploaded'}
+                                            </span>
+                                        </div>
+                                        <div className="flex border size-32 items-center justify-between">
+                                        </div>
+                                    </div>
+
                                 )}
                             </div>
 
-                            {/* Save Button */}
                             <button
                                 onClick={saveTheme}
                                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow mt-2"

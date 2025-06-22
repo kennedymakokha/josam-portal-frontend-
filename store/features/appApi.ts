@@ -14,11 +14,12 @@ type FetchThemeParams = {
 
 export const injectEndpoints = api.injectEndpoints({
     endpoints: (builder) => ({
-        registerTheme: builder.mutation<void, Theme>({
-            query: (body) => ({
+        registerTheme: builder.mutation({
+            query: (formData) => ({
                 url: '/theme',
                 method: 'POST',
-                body,
+                body: formData,
+                formData: true, // Ensure proper headers are set
             }),
         }),
 
