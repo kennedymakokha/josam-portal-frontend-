@@ -1,48 +1,48 @@
-import { api } from '../slices'
+import { Service } from '@/app/admin/dashboard/forms/page';
+import { api } from '../slices';
+
+type FetchParams = {
+    name?: string;
+};
 
 export const injectEndpoints = api.injectEndpoints({
-    endpoints: (builder: { mutation: (arg0: { query: ((body: any) => { url: string; method: string; body: any; }) | ((body: any) => { url: string; method: string; body: any; }) | ((body: any) => { url: string; method: string; body: any; }) | (() => { url: string; method: string; }); }) => any; query: (arg0: { query: (() => string) | (() => string); }) => any; }) => ({
-        registerService: builder.mutation({
+    endpoints: (builder) => ({
+        registerService:  builder.mutation<void, FormData>({
             query: (body) => ({
                 url: '/services',
                 method: 'POST',
                 body,
             }),
         }),
-        toggleactiveService: builder.mutation({
-            query: (id: any) => ({
+        toggleactiveService: builder.mutation<void, string>({
+            query: (id) => ({
                 url: `/services/toggle-active/${id}`,
                 method: 'PUT',
-                body: {}
             }),
         }),
-        deleteService: builder.mutation({
-            query: (id: any) => ({
+        deleteService: builder.mutation<void, string>({
+            query: (id) => ({
                 url: `/services/${id}`,
                 method: 'DELETE',
-                body: {}
             }),
         }),
-        updateService: builder.mutation({
+        updateService:  builder.mutation<void, { _id: string; data: FormData }>({
             query: (body) => ({
                 url: `/services/${body._id}`,
                 method: 'PUT',
-                body
+                body,
             }),
         }),
-        getServices: builder.query({
-            query: () => '/services',
+        getServices: builder.query<Service[], FetchParams>({
+            query: ({ name }) => `/services?app_name=${name}`,
         }),
-        // getServiceById: builder.query({
-        //     query: (id: string) => `/services/${id}`,
-        // })
     }),
 });
 
 export const {
     useRegisterServiceMutation,
-    useGetServicesQuery,
     useToggleactiveServiceMutation,
     useDeleteServiceMutation,
     useUpdateServiceMutation,
+    useGetServicesQuery,
 } = injectEndpoints;

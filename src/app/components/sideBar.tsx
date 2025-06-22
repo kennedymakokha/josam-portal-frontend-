@@ -7,7 +7,7 @@ import { ThemeContext } from '../../../context/themeContext';
 
 // Navigation items
 const navItems = [
-    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Dashboard', path: '/admin' },
     { name: 'Forms', path: '/admin/dashboard/forms' },
     { name: 'Settings', path: '/settings' },
 ];
@@ -42,7 +42,7 @@ export default function Sidebar() {
             className="w-64 min-h-screen shadow-md hidden md:block"
             style={{ backgroundColor: bgColor, color: textColor }}
         >
-            <div className="p-4 flex items-center gap-3 text-xl font-bold">
+            <Link href='/admin/dashboard' className="p-4 flex items-center gap-3 text-xl font-bold">
                 {logo && typeof logo === 'string' ? (
                     <Image
                         src={logo}
@@ -55,7 +55,7 @@ export default function Sidebar() {
                     <div className="w-9 h-9 bg-gray-300 rounded" />
                 )}
                 <span>{app_name || 'App'} Portal</span>
-            </div>
+            </Link>
 
             <nav className="p-4 space-y-2">
                 {navItems.map(item => (

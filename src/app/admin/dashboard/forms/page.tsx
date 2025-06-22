@@ -13,11 +13,13 @@ import {
     useDeleteServiceMutation,
     useToggleactiveServiceMutation,
 } from '../../../../../store/features/serviceApi';
+import { skipToken } from '@reduxjs/toolkit/query';
 
 export interface Service {
     _id?: string;
     name: string;
     inputs: any[];
+    app_name: string;
     apiEndpoint: string;
     image?: File | string | null;
     active?: boolean;
@@ -53,11 +55,21 @@ function ImageCell({ val }: { val: string | File | null | undefined }) {
 export default function ServiceManagerPage() {
     const { primaryColor } = useContext(ThemeContext);
     const textColor = getTextColorForBackground(primaryColor);
-
-    const { data, refetch, isFetching } = useGetServicesQuery(undefined);
+    // const { data, refetch, isFetching } = useGetServicesQuery({ name: localStorage.getItem('app_name') });
     const [deleteService] = useDeleteServiceMutation();
     const [toggleService] = useToggleactiveServiceMutation();
     const [selectedService, setSelectedService] = useState<Service | null>(null);
+    const [appName, setAppName] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setAppName(localStorage.getItem('app_name'));
+        }
+    }, []);
+
+    const { data, refetch, isFetching } = useGetServicesQuery(
+        appName ? { name: appName } : skipToken // <-- only fetch if appName is available
+    );
     const servicesData: Service[] = (data as any)?.services?.map((s: Service) => ({
         ...s,
         inputs:
@@ -75,6 +87,7 @@ export default function ServiceManagerPage() {
         apiEndpoint: '',
         image: null,
         category: '',
+        app_name: appName || '',
     });
 
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -107,6 +120,7 @@ export default function ServiceManagerPage() {
         setFormService({
             name: '',
             inputs: [],
+            app_name: "",
             apiEndpoint: '',
             image: null,
             category: '',
@@ -126,7 +140,7 @@ export default function ServiceManagerPage() {
         setConfirmDescription('This action cannot be undone.');
         setConfirmDanger(true);
         setConfirmAction(() => async () => {
-            await deleteService(s._id).unwrap();
+            await deleteService(s._id!).unwrap();
             refetch();
             setShowConfirmModal(false);
         });
@@ -138,7 +152,7 @@ export default function ServiceManagerPage() {
         setConfirmDescription(`This will ${s.active ? 'deactivate' : 'activate'} the service.`);
         setConfirmDanger(false);
         setConfirmAction(() => async () => {
-            await toggleService(s._id).unwrap();
+            await toggleService(s._id!).unwrap();
             refetch();
             setShowConfirmModal(false);
         });

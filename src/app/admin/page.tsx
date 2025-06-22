@@ -33,7 +33,7 @@ export default function AdminPage() {
 
     const router = useRouter();
     const [submit, { isLoading: saving }] = useRegisterThemeMutation();
-    const { data: apps, refetch } = useGetThemeQuery<{ data: Theme[] }>({ name: 'all' });
+    const { data: apps, refetch, } = useGetThemeQuery<{ data: Theme[] }>({ name: 'all' });
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -87,6 +87,7 @@ export default function AdminPage() {
             {/* DataTable rendering */}
             {apps?.length ? (
                 <DataTable<Theme>
+                    // loading={LoadingData}
                     data={apps}
                     columns={[
                         { key: 'app_name', label: 'App Name' },
@@ -126,9 +127,8 @@ export default function AdminPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                             </svg>,
 
-                            onClick: (row) =>
-                                router.push(`/admin/dashboard?name=${row.app_name}`),
-                            className: 'text-blue-600 border border-white/20 rounded p-1 flex items-center justify-center',
+                            onClick: (row) => { router.push(`/admin/dashboard`); setAppname(row.app_name); setPrimaryColor(row.primaryColor); setTagline(row.tagline); setLogo(row.logo || null); localStorage.setItem('app_name', row.app_name); },
+                            className: 'text-white/20 border border-white rounded p-1 flex items-center justify-center',
                         },
                         {
                             icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">

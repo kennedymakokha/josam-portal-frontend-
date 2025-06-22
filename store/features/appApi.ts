@@ -23,7 +23,7 @@ export const injectEndpoints = api.injectEndpoints({
         }),
 
         getTheme: builder.query<Theme, FetchThemeParams>({
-            query: ({ name }) => `/theme?name=${name}`,
+            query: (params) => `/theme?name=${params.name}`,
         }),
     }),
     overrideExisting: false,

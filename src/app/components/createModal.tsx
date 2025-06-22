@@ -15,7 +15,7 @@ type InputOption = {
 type InputField = {
   name: string;
   type: 'text' | 'number' | 'password' | 'selectbox' | 'radio' | 'date' | 'checkbox';
-  value: string;
+  value: string | boolean | number | any[];
   required: boolean;
   options?: InputOption[];
 };
@@ -32,6 +32,7 @@ type ServiceData = {
   name: string;
   _id?: string;
   inputs: InputField[];
+  app_name: string
   apiEndpoint?: string;
   image?: File | null;
   category?: string;
@@ -115,6 +116,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
 
     const formData = new FormData();
     formData.append('name', localService.name);
+    formData.append('app_name', localService.app_name || localStorage.getItem('app_name') || '');
     if (localService.apiEndpoint)
       formData.append('apiEndpoint', localService.apiEndpoint);
     if (localService.image) formData.append('image', localService.image);
@@ -126,9 +128,15 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
 
     try {
       if (editMode) {
-        await updateService({ data: formData, _id: localService?._id }).unwrap();
+
+        if (localService._id) {
+          await updateService({ data: formData, _id: localService?._id }).unwrap();
+        } else {
+          console.error('Cannot edit service without _id');
+        }
         refetch();
       } else {
+
         await submitService(formData).unwrap();
       }
       refetch();
@@ -378,7 +386,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
                 type="text"
                 className="w-full border px-3 py-2 rounded"
                 placeholder="Input value"
-                value={input.value}
+                value={String(input.value ?? '')}
                 onChange={(e) => handleInputChange(index, 'value', e.target.value)}
               />
               <label className="inline-flex items-center gap-2">

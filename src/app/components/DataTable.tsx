@@ -11,9 +11,9 @@ type Action<Data> = {
     label?: string;
     onClick: (row: Data) => void;
     className?: string;
-    icon?: React.ReactNode; // ✅ Add th
-    ariaLabel?: string; // ✅ Add this
-    disabled?: boolean; // 👈 Add this line
+    icon?: React.ReactNode;
+    ariaLabel?: string;
+    disabled?: boolean;
 };
 
 type DataTableProps<Data extends object> = {
@@ -21,6 +21,7 @@ type DataTableProps<Data extends object> = {
     columns: Column<Data>[];
     actions?: Action<Data>[];
     itemsPerPage?: number;
+    loading?: boolean;
 };
 
 export default function DataTable<Data extends object>({
@@ -28,6 +29,7 @@ export default function DataTable<Data extends object>({
     columns,
     actions = [],
     itemsPerPage = 5,
+    loading = false,
 }: DataTableProps<Data>) {
     const [currentPage, setCurrentPage] = React.useState(1);
 
@@ -51,35 +53,52 @@ export default function DataTable<Data extends object>({
                     </tr>
                 </thead>
                 <tbody>
-                    {paginatedData.map((row, rowIndex) => (
-                        <tr key={rowIndex} className="border-t">
-                            {columns.map((col, colIndex) => (
-                                <td key={colIndex} className="px-4 py-2 border">
-                                    {col.render
-                                        ? col.render(row[col.key], row)
-                                        : (String(row[col.key]) as React.ReactNode)}
-                                </td>
-                            ))}
-                            {actions.length > 0 && (
-                                <td className="px-4 py-2 border">
-                                    <div className="flex gap-2">
-                                        {actions.map((action, i) => (
-                                            <button
-                                                key={i}
-                                                onClick={() => action.onClick(row)}
-                                                aria-label={action.ariaLabel || action.label}
-                                                disabled={action.disabled}
-                                                className={action.className || 'bg-blue-500  text-white px-2 py-1 rounded flex items-center gap-1'}
-                                            >
-                                                {action.icon && <span>{action.icon}</span>}
-                                                {action.label && <span>{action.label}</span>}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </td>
-                            )}
+                    {loading ? (
+                        <tr>
+                            <td
+                                colSpan={columns.length + (actions.length > 0 ? 1 : 0)}
+                                className="text-center py-6"
+                            >
+                                <div className="flex justify-center items-center space-x-2">
+                                    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-gray-800"></div>
+                                    <span>Loading...</span>
+                                </div>
+                            </td>
                         </tr>
-                    ))}
+                    ) : (
+                        paginatedData.map((row, rowIndex) => (
+                            <tr key={rowIndex} className="border-t">
+                                {columns.map((col, colIndex) => (
+                                    <td key={colIndex} className="px-4 py-2 border">
+                                        {col.render
+                                            ? col.render(row[col.key], row)
+                                            : (String(row[col.key]) as React.ReactNode)}
+                                    </td>
+                                ))}
+                                {actions.length > 0 && (
+                                    <td className="px-4 py-2 border">
+                                        <div className="flex gap-2">
+                                            {actions.map((action, i) => (
+                                                <button
+                                                    key={i}
+                                                    onClick={() => action.onClick(row)}
+                                                    aria-label={action.ariaLabel || action.label}
+                                                    disabled={action.disabled}
+                                                    className={
+                                                        action.className ||
+                                                        'bg-blue-500 text-white px-2 py-1 rounded flex items-center gap-1'
+                                                    }
+                                                >
+                                                    {action.icon && <span>{action.icon}</span>}
+                                                    {action.label && <span>{action.label}</span>}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </td>
+                                )}
+                            </tr>
+                        ))
+                    )}
                 </tbody>
             </table>
 
@@ -87,7 +106,7 @@ export default function DataTable<Data extends object>({
             <div className="flex justify-center items-center gap-3 pt-2">
                 <button
                     onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                    disabled={currentPage === 1}
+                    disabled={loading || currentPage === 1}
                     className="px-4 py-1 bg-gray-300 rounded disabled:opacity-50"
                 >
                     Previous
@@ -97,7 +116,7 @@ export default function DataTable<Data extends object>({
                 </span>
                 <button
                     onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-                    disabled={currentPage === totalPages}
+                    disabled={loading || currentPage === totalPages}
                     className="px-4 py-1 bg-gray-300 rounded disabled:opacity-50"
                 >
                     Next
