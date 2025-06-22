@@ -6,7 +6,7 @@ import { useGetThemeQuery, useRegisterThemeMutation } from '../../../store/featu
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import DataTable from '../components/DataTable';
-import axios from 'axios';
+
 import { useGenerateCodeMutation } from '../../../store/features/codeApi';
 type Theme = {
     primaryColor: string;
@@ -66,6 +66,8 @@ export default function AdminPage() {
 
             setQrImage(res.qrImage);
         } catch (err) {
+            
+            console.error('Error generating QR code:', err);
             // setError((err instanceof Error ? err.message : 'An unknown error occurred') || 'Failed to fetch QR codes');
         } finally {
 
@@ -87,7 +89,7 @@ export default function AdminPage() {
             if (logoFile) {
                 formData.append('logo', logoFile);
             }
-            let response = await submit(formData).unwrap();
+            const response = await submit(formData).unwrap();
             await handleGenerate(response._id); // Trigger QR code generation after saving them
             // handlecloseModal();
             await refetch();
@@ -113,13 +115,7 @@ export default function AdminPage() {
         setLogo(null);
         setLogoFile(null);
     };
-    const getContrastColor = (hex: string) => {
-        const r = parseInt(hex.substr(1, 2), 16);
-        const g = parseInt(hex.substr(3, 2), 16);
-        const b = parseInt(hex.substr(5, 2), 16);
-        return (r * 0.299 + g * 0.587 + b * 0.114) > 186 ? '#000' : '#fff';
-    };
-
+   
 
 
     return (
