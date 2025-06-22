@@ -5,6 +5,7 @@ import {
   useRegisterServiceMutation,
   useUpdateServiceMutation,
 } from '../../../store/features/serviceApi';
+import { Service } from '../admin/dashboard/forms/page';
 
 type InputOption = {
   label: string;
@@ -40,7 +41,7 @@ type ServiceData = {
 interface ServiceFormModalProps {
   editMode?: boolean;
   newService: ServiceData;
-  setNewService: React.Dispatch<React.SetStateAction<ServiceData>>;
+  setNewService: React.Dispatch<React.SetStateAction<Service | null>>;
   onClose: () => void;
   onSave: (service: ServiceData) => void;
   refetch: () => void;

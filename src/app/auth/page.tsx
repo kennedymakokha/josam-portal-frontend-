@@ -10,11 +10,11 @@ export default function AuthPage() {
     const router = useRouter();
 
     const { user } = useSelector((state: RootState) => state.auth)
-    
+
     useEffect(() => {
-      if (user) {
-        router.push('/dashboard');
-      }
+        if (user) {
+            router.push('/admin');
+        }
     }, [user, router]);
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-slate-900 via-slate-600 to-slate-700">

@@ -41,7 +41,7 @@ export default function AuthForm({ setIsLogin, isLogin }: AuthFormProps) {
   const router = useRouter();
 
   const handleGoogleLogin = async () => {
-    await signIn('google', { callbackUrl: '/dashboard' });
+    await signIn('google', { callbackUrl: '/admin/dashboard' });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +63,7 @@ export default function AuthForm({ setIsLogin, isLogin }: AuthFormProps) {
         dispatch(loginSuccess(res))
         setMessage(`Logged in successfully with ${formData.identifier}`);
         setMessageType('success');
-        router.push("/dashboard");
+        router.push("/admin/dashboard");
       } else {
         await registerUser({
           name: formData.name,

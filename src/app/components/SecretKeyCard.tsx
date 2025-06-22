@@ -1,14 +1,18 @@
 // components/SecretKeyCard.tsx
 'use client';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { motion } from 'framer-motion';
 import { generateSecretKey } from '../../../utils/keygen';
 import { useUpdateKeyMutation } from '../../../store/features/authApi';
+import { getTextColorForBackground } from '../../../utils/themeUtils';
+import { ThemeContext } from '../../../context/themeContext';
 
 export default function SecretKeyCard() {
     const [key, setKey] = useState('');
     const [copied, setCopied] = useState(false);
     const [upateKey] = useUpdateKeyMutation()
+    const { primaryColor } = useContext(ThemeContext);
+    const textColor = getTextColorForBackground(primaryColor);
     const handleCopy = async () => {
         if (!key) return;
         try {
@@ -27,7 +31,7 @@ export default function SecretKeyCard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
         >
-            <h2 className="text-xl font-semibold mb-4">Secret Key Generator</h2>
+            <h2 style={{ backgroundColor: textColor, color: primaryColor, }} className="text-xl font-semibold mb-4">Secret Key Generator</h2>
             <div className="flex justify-between items-center gap-4 flex-wrap">
                 <div className={`flex items-center px-4 py-2 rounded-md ${key ? "bg-slate-300 text-sm italic" : "bg-gray-100"}`}>
                     <p className="break-all">{key || 'Click below to generate a key'}</p>
