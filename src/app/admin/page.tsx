@@ -59,7 +59,7 @@ export default function AdminPage() {
                 formData.append('logo', logoFile);
             }
             await submit(formData).unwrap();
-            setIsModalOpen(false);
+            handlecloseModal();
             await refetch();
             router.push(`/admin/dashboard?name=${app_name}`);
         } catch (error) {
@@ -178,7 +178,7 @@ export default function AdminPage() {
                     <div className="bg-white rounded-lg p-6 w-full max-w-lg shadow-lg relative">
                         <button
                             className="absolute top-2 right-3 text-gray-500 hover:text-gray-800"
-                            onClick={() => setIsModalOpen(false)}
+                            onClick={() => handlecloseModal()}
                         >
                             ✕
                         </button>
