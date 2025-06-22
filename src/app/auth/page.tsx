@@ -7,15 +7,15 @@ import { RootState } from '../../../store/store';
 
 export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true);
-    const router = useRouter();
+    // const router = useRouter();
 
-    const { user } = useSelector((state: RootState) => state.auth)
+    // const { user } = useSelector((state: RootState) => state.auth)
 
-    useEffect(() => {
-        if (user) {
-            router.push('/admin');
-        }
-    }, [user, router]);
+    // useEffect(() => {
+    //     if (user) {
+    //         router.push('/admin');
+    //     }
+    // }, [user, router]);
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-slate-900 via-slate-600 to-slate-700">
             <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">

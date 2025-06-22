@@ -6,11 +6,13 @@ import { useGetThemeQuery, useRegisterThemeMutation } from '../../../store/featu
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import DataTable from '../components/DataTable';
-
+import axios from 'axios';
+import { useGenerateCodeMutation } from '../../../store/features/codeApi';
 type Theme = {
     primaryColor: string;
     tagline: string;
     app_name: string;
+    code?: string | null; // Assuming code is a string or null
     _id?: string;
     logo: string | null;
 };
@@ -30,9 +32,11 @@ export default function AdminPage() {
     const router = useRouter();
     const { data: apps, refetch } = useGetThemeQuery<{ data: Theme[] }>({ name: 'all' });
     const [submit, { isLoading: saving }] = useRegisterThemeMutation();
+    const [generate] = useGenerateCodeMutation();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [logoFile, setLogoFile] = useState<File | null>(null);
-
+    const [qrImage, setQrImage] = useState('');
 
     const handleLogoUpload = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -41,7 +45,32 @@ export default function AdminPage() {
             setLogo(URL.createObjectURL(file)); // Preview only
         }
     };
+    const handleGenerate = async (id: string) => {
 
+
+        setQrImage('');
+
+        try {
+            const formData = new FormData();
+            if (!app_name) {
+                throw new Error('App name is required before generating.');
+            }
+            formData.append('app_name', app_name);
+            formData.append('color', primaryColor);
+            formData.append('id', id);
+            formData.append('background', '#ffffff');
+            if (logoFile) formData.append('logo', logoFile);
+
+            // Correct endpoints matching your backend
+            const res = await generate(formData).unwrap()
+
+            setQrImage(res.qrImage);
+        } catch (err) {
+            // setError((err instanceof Error ? err.message : 'An unknown error occurred') || 'Failed to fetch QR codes');
+        } finally {
+
+        }
+    };
     const saveTheme = async () => {
         if (!app_name || app_name.trim() === '') {
             alert('App name is required');
@@ -58,10 +87,11 @@ export default function AdminPage() {
             if (logoFile) {
                 formData.append('logo', logoFile);
             }
-            await submit(formData).unwrap();
-            handlecloseModal();
+            let response = await submit(formData).unwrap();
+            await handleGenerate(response._id); // Trigger QR code generation after saving them
+            // handlecloseModal();
             await refetch();
-            router.push(`/admin/dashboard?name=${app_name}`);
+            // router.push(`/admin/dashboard?name=${app_name}`);
         } catch (error) {
             console.error('Theme save failed:', error);
             alert('An error occurred while saving the theme.');
@@ -83,6 +113,15 @@ export default function AdminPage() {
         setLogo(null);
         setLogoFile(null);
     };
+    const getContrastColor = (hex: string) => {
+        const r = parseInt(hex.substr(1, 2), 16);
+        const g = parseInt(hex.substr(3, 2), 16);
+        const b = parseInt(hex.substr(5, 2), 16);
+        return (r * 0.299 + g * 0.587 + b * 0.114) > 186 ? '#000' : '#fff';
+    };
+
+
+
     return (
         <div className="min-h-screen p-8 text-white mx-auto bg-gradient-to-tr from-slate-900 via-slate-600 to-slate-700">
             <div className="flex justify-between items-center mb-6">
@@ -114,6 +153,22 @@ export default function AdminPage() {
                         {
                             key: 'logo',
                             label: 'Logo',
+                            render: (value) =>
+                                value ? (
+                                    <Image
+                                        src={value}
+                                        alt="Logo"
+                                        width={40}
+                                        height={40}
+                                        className="object-contain w-10 h-10"
+                                    />
+                                ) : (
+                                    'N/A'
+                                ),
+                        },
+                        {
+                            key: 'code',
+                            label: 'Code',
                             render: (value) =>
                                 value ? (
                                     <Image
@@ -227,7 +282,7 @@ export default function AdminPage() {
                                 />
                                 {logo && (
                                     <div className="flex items-center justify-between">
-                                        <div className="flex border  size-32 items-center justify-between">
+                                        <div className="flex border  size-32 items-center justify-center">
                                             <span className="text-sm text-gray-700">
                                                 {logoFile ? <Image
                                                     height={200}
@@ -238,7 +293,10 @@ export default function AdminPage() {
                                                 /> : 'No logo uploaded'}
                                             </span>
                                         </div>
-                                        <div className="flex border size-32 items-center justify-between">
+                                        <div className="flex border size-32 items-center justify-center">
+                                            <span className="text-sm text-gray-700">
+                                                {qrImage ? <Image width={100} height={100} src={qrImage} alt="QR Code" className="mx-auto max-w-full" /> : 'No logo uploaded'}
+                                            </span>
                                         </div>
                                     </div>
 
