@@ -30,7 +30,7 @@ export default function AdminPage() {
     } = useContext(ThemeContext);
 
     const router = useRouter();
-    const { data: apps, refetch } = useGetThemeQuery<{ data: Theme[] }>({ name: 'all' });
+    const { data: apps, refetch } = useGetThemeQuery<{ data: Theme[] }>({ id: 'all' });
     const [submit, { isLoading: saving }] = useRegisterThemeMutation();
     const [generate] = useGenerateCodeMutation();
 
@@ -66,7 +66,7 @@ export default function AdminPage() {
 
             setQrImage(res.qrImage);
         } catch (err) {
-            
+
             console.error('Error generating QR code:', err);
             // setError((err instanceof Error ? err.message : 'An unknown error occurred') || 'Failed to fetch QR codes');
         } finally {
@@ -91,7 +91,7 @@ export default function AdminPage() {
             }
             const response = await submit(formData).unwrap();
             await handleGenerate(response._id); // Trigger QR code generation after saving them
-            // handlecloseModal();
+            handlecloseModal();
             await refetch();
             // router.push(`/admin/dashboard?name=${app_name}`);
         } catch (error) {
@@ -115,11 +115,8 @@ export default function AdminPage() {
         setLogo(null);
         setLogoFile(null);
     };
-   
-
-
     return (
-        <div className="min-h-screen p-8 text-white mx-auto bg-gradient-to-tr from-slate-900 via-slate-600 to-slate-700">
+        <div className="min-h-screen p-8 text-black mx-auto bg-slate-100">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold">Your Applications</h1>
                 <button
@@ -182,7 +179,7 @@ export default function AdminPage() {
                     actions={[
                         {
                             icon: (
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                <svg style={{ color: `${primaryColor}` }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                 </svg>
@@ -195,7 +192,7 @@ export default function AdminPage() {
                                 setLogo(row.logo || null);
                                 localStorage.setItem('app_name', row.app_name);
                             },
-                            className: 'text-white/20 border border-white rounded p-1 flex items-center justify-center',
+                            className: 'text-white/20 border border-slate-400  rounded p-1 flex items-center justify-center',
                         },
                         {
                             icon: (

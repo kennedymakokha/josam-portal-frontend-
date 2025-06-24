@@ -9,12 +9,21 @@ export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true);
     const router = useRouter();
 
-    const { user } = useSelector((state: RootState) => state.auth)
-    
+    const {user} = useSelector((state: RootState) => state.auth)
+   
     useEffect(() => {
-      if (user) {
-        router.push('/dashboard');
-      }
+        if (user) {
+            if (user?.role === 'superadmin') {
+                router.push('/admin');
+            }
+            else if (user?.role === 'admin') {
+                router.push('/admin/dashboard');
+            } else {
+                router.push('/admin/dashboard');
+            }
+        } else {
+            router.push('/auth');
+        }
     }, [user, router]);
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-slate-900 via-slate-600 to-slate-700">

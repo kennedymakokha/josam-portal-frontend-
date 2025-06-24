@@ -16,7 +16,7 @@ export default function AuthForm({ setIsLogin, isLogin }: AuthFormProps) {
   const [formData, setFormData] = useState({
     identifier: '',
     password: '',
-    fcm_token:"fSUKQBQSTnOU6Vn7aygyPw:APA91bHFRWNbsOCj6Vdrri4QY-NBZz-H4ZhmzKVlJu6EoI9kYWP6nY2cgP9WI0MIOhn8FLmGjiMzLYg1CbMmpfdJbxHoeteJKCSieSu_xvf8ZMOQekgg09Y",
+    fcm_token: "fSUKQBQSTnOU6Vn7aygyPw:APA91bHFRWNbsOCj6Vdrri4QY-NBZz-H4ZhmzKVlJu6EoI9kYWP6nY2cgP9WI0MIOhn8FLmGjiMzLYg1CbMmpfdJbxHoeteJKCSieSu_xvf8ZMOQekgg09Y",
     name: '',
     phone_number: '',
     email: '',
@@ -59,11 +59,31 @@ export default function AuthForm({ setIsLogin, isLogin }: AuthFormProps) {
 
     try {
       if (isLogin) {
-        const res = await loginUser({fcm_token:formData.fcm_token, identifier: formData.identifier, password: formData.password }).unwrap()as LoginResponse;
-        dispatch(loginSuccess(res))
+        const res = await loginUser({ fcm_token: formData.fcm_token, identifier: formData.identifier, password: formData.password }).unwrap() as LoginResponse;
+        console.log(res, "login response")
+        dispatch(loginSuccess({
+          token: res.token,
+          user: {
+            _id: res.user._id,
+            phone_number: res.user.phone_number,
+            name: res.user.name,
+            email: res.user.email,
+            role: res.user.role,
+            app_id: res.user?.app_id
+          }
+        }))
         setMessage(`Logged in successfully with ${formData.identifier}`);
         setMessageType('success');
+
+        // if (res.user.role === 'superadmin') {
+        //   router.push("/admin")
+        // } else if (res.user.role === 'admin') {
+        //   console.log(res.user.role,"admin")
         router.push("/admin/dashboard");
+        // }
+        // else {
+        //   router.push("/404");
+        // }
       } else {
         await registerUser({
           name: formData.name,
@@ -76,7 +96,7 @@ export default function AuthForm({ setIsLogin, isLogin }: AuthFormProps) {
         setIsLogin(true)
       }
     } catch (error) {
-   
+
       if (error instanceof Error) {
         const err = error as ApiError;
         const errorMsg = err.data || err.error || err.message || 'Something went wrong';

@@ -9,7 +9,7 @@ type Theme = {
 };
 
 type FetchThemeParams = {
-    name?: string;
+    id?: string;
 };
 
 export const injectEndpoints = api.injectEndpoints({
@@ -23,14 +23,34 @@ export const injectEndpoints = api.injectEndpoints({
             }),
         }),
 
+        getThemes: builder.query<Theme, FetchThemeParams>({
+            query: (params) => `/theme/apps/all?id=${params.id}`,
+        }),
         getTheme: builder.query<Theme, FetchThemeParams>({
-            query: (params) => `/theme?name=${params.name}`,
+            query: (params) => `/theme/apps/id=${params.id}`,
+        }),
+        deleteTheme: builder.mutation<void, string>({
+            query: (id) => ({
+                url: `/theme/${id}`,
+                method: 'DELETE',
+            }),
+        }),
+        updateTheme: builder.mutation<void, { _id: string; data: FormData }>({
+            query: (body) => ({
+                url: `/theme/${body._id}`,
+                method: 'PUT',
+                body,
+            }),
         }),
     }),
+
     overrideExisting: false,
 });
 
 export const {
     useRegisterThemeMutation,
     useGetThemeQuery,
+    useGetThemesQuery,
+    // uaseDeleteThemeMutation,
+    useUpdateThemeMutation,
 } = injectEndpoints;

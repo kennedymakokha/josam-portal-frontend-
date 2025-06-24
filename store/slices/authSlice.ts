@@ -9,11 +9,13 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 
 // }
-interface AuthUser {
+export interface AuthUser {
     id: string;
     phone_number: string;
     name?: string;
     email?: string;
+    app_id?: string; // Optional app_id field
+    role?: 'user' | 'admin' | 'superadmin'; // Optional role field
 }
 
 interface AuthState {
@@ -34,14 +36,26 @@ const authSlice = createSlice({
     reducers: {
         loginSuccess: (
             state,
-            action: PayloadAction<{ token: string | null; id: string; phone_number: string; name?: string; email?: string }>
+            action: PayloadAction<{
+                token: string;
+                user: {
+                    _id: string;
+                    phone_number: string;
+                    name: string;
+                    email: string;
+                    app_id?: string; // Optional app_id
+                    role: 'user' | 'admin' | 'superadmin';
+                };
+            }>
         ) => {
             state.isAuthenticated = true;
             state.user = {
-                id: action.payload.id,
-                phone_number: action.payload.phone_number,
-                name: action.payload.name,
-                email: action.payload.email,
+                id: action.payload.user._id,
+                phone_number: action.payload.user.phone_number,
+                name: action.payload.user.name,
+                email: action.payload.user.email,
+                app_id: action.payload.user.app_id || undefined, // Optional app_id
+                role: action.payload.user.role || 'user', // Default role if not provided
             };
             state.token = action.payload.token;
         },

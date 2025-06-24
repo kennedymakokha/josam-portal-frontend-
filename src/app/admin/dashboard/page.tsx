@@ -4,11 +4,14 @@ import { ThemeContext } from '../../../../context/themeContext';
 import { useSearchParams } from 'next/navigation';
 import { useGetThemeQuery } from '../../../../store/features/appApi';
 import Image from 'next/image';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../../store/store';
+
 
 export default function Home() {
   const searchParams = useSearchParams();
   const nameParam = searchParams.get('name');
-
+  const { user } = useSelector((state: RootState) => state.auth)
   const {
     setPrimaryColor,
     setTagline,
@@ -20,19 +23,19 @@ export default function Home() {
     app_name,
   } = useContext(ThemeContext);
 
-  const { data: theme } = useGetThemeQuery(
-    { name: nameParam as string },
-    { skip: !nameParam }
-  );
+  // const { data: theme } = useGetThemeQuery(
+  //   { id: nameParam || user?.app_id as string },
+  //   { skip: !nameParam || !user?.app_id }
+  // );
 
-  useEffect(() => {
-    if (!theme) return;
+  // useEffect(() => {
+  //   if (!theme) return;
 
-    setPrimaryColor(theme.primaryColor);
-    setTagline(theme.tagline);
-    setLogo(theme.logo);
-    setAppname(theme.app_name);
-  }, [theme, setAppname, setPrimaryColor, setLogo, setTagline]);
+  //   setPrimaryColor(theme.primaryColor);
+  //   setTagline(theme.tagline);
+  //   setLogo(theme.logo);
+  //   setAppname(theme.app_name);
+  // }, [theme, setAppname, setPrimaryColor, setLogo, setTagline]);
 
   return (
     <div

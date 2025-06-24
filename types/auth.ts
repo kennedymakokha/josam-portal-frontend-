@@ -3,10 +3,12 @@ type LoginResponse = {
     id: string
     phone_number: string
     user: {
-        id: string;
+        app_id: string | undefined;
+        _id: string;
         name: string;
         email: string;
         phone_number: string
+        role: 'user' | 'admin' | 'superadmin'; // Optional role field
         // etc.
     };
 };

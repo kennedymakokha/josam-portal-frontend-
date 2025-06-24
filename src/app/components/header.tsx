@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import { logout } from '../../../store/slices/authSlice';
 import { ThemeContext } from '../../../context/themeContext';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 function isLightColor(hex: string): boolean {
     const color = hex.length === 4
@@ -24,7 +26,7 @@ export default function Header() {
     const { user } = useSelector((state: RootState) => state.auth);
     const { primaryColor } = useContext(ThemeContext);
     const dropdownRef = useRef<HTMLDivElement>(null);
-
+    const router = useRouter();
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const isLight = isLightColor(primaryColor);
@@ -50,7 +52,12 @@ export default function Header() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleLogout = () => dispatch(logout());
+    const handleLogout = () => {
+        dispatch(logout());
+        setDropdownOpen(false);
+        router.push('/auth');
+        // Optionally redirect to login page or show a message
+    };
 
     return (
         <header
@@ -72,6 +79,8 @@ export default function Header() {
                         <div className="px-4 py-3 border-b">
                             <p className="font-semibold">{userName}</p>
                             <p className="text-sm text-gray-600 truncate">{userEmail}</p>
+                            <Link href="/admin/settings/profile" className="text-blue-600 hover:underline text-sm">
+                                Profile Settings</Link>
                         </div>
                         <button
                             onClick={handleLogout}
