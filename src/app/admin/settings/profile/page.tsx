@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useGetThemeQuery, useUpdateThemeMutation } from '../../../../../store/features/appApi';
 import { RootState } from '../../../../../store/store';

@@ -1,3 +1,4 @@
+"@typescript-eslint/no-explicit-any"
 export type InputOption = {
   label: string;
   value: string;

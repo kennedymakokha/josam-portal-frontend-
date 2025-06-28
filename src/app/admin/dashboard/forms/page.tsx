@@ -51,7 +51,7 @@ export default function ServiceManagerPage() {
     const [deleteService] = useDeleteServiceMutation();
     const [toggleService] = useToggleactiveServiceMutation();
     const [selectedService, setSelectedService] = useState<Service | null>(null);
-    const [appName, setAppName] = useState<string | null>(null);
+  
     const { data, refetch, isFetching } = useGetServicesQuery({});
     console.log(selectedService)
     const servicesData: Service[] = (data as { services?: RawService[] })?.services?.map((s) => {
@@ -83,7 +83,7 @@ export default function ServiceManagerPage() {
         apiEndpoint: '',
         image: null,
         category: '',
-        app_name: appName || '',
+        app_name:  '',
     });
 
     const [showConfirmModal, setShowConfirmModal] = useState(false);
