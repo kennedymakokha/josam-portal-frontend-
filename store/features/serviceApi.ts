@@ -1,4 +1,5 @@
-import { Service } from '@/app/admin/dashboard/forms/page';
+
+import { Service } from '../../types/forms';
 import { api } from '../slices';
 
 type FetchParams = {
@@ -7,7 +8,7 @@ type FetchParams = {
 
 export const injectEndpoints = api.injectEndpoints({
     endpoints: (builder) => ({
-        registerService:  builder.mutation<void, FormData>({
+        registerService: builder.mutation<void, FormData>({
             query: (body) => ({
                 url: '/services',
                 method: 'POST',
@@ -26,7 +27,7 @@ export const injectEndpoints = api.injectEndpoints({
                 method: 'DELETE',
             }),
         }),
-        updateService:  builder.mutation<void, { _id: string; data: FormData }>({
+        updateService: builder.mutation<void, { _id: string; data: FormData }>({
             query: (body) => ({
                 url: `/services/${body._id}`,
                 method: 'PUT',
@@ -44,7 +45,7 @@ export const {
     useToggleactiveServiceMutation,
     useDeleteServiceMutation,
     useUpdateServiceMutation,
-    
-    
+
+
     useGetServicesQuery,
 } = injectEndpoints;
