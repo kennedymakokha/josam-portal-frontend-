@@ -7,7 +7,8 @@ export type InputOption = {
 export type InputField = {
   name: string;
   type: 'text' | 'number' | 'password' | 'selectbox' | 'radio' | 'date' | 'checkbox';
-  value: string | boolean | number | string[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: string | boolean | number | any[];
   required: boolean;
   options?: InputOption[];
 };

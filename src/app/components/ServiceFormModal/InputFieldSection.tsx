@@ -5,11 +5,8 @@ import { InputField, InputOption } from './types';
 interface InputFieldSectionProps {
   input: InputField;
   index: number;
-  onInputChange: <K extends keyof InputField>(
-    index: number,
-    key: K,
-    value: InputField[K]
-  ) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onInputChange: (index: number, key: keyof InputField, value: string | boolean | number | any[]) => void;
   onOptionChange: (
     fieldIndex: number,
     optionIndex: number,
@@ -18,7 +15,6 @@ interface InputFieldSectionProps {
   ) => void;
   onAddOption: (fieldIndex: number) => void;
 }
-
 
 const InputFieldSection: React.FC<InputFieldSectionProps> = ({
   input,
