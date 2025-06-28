@@ -73,7 +73,7 @@ export default function ServiceManagerPage() {
             inputs: parsedInputs,
         };
     }) ?? [];
-    console.log("DATA", data)
+   
     // States for modals and table
     const [showFormModal, setShowFormModal] = useState(false);
     const [editMode, setEditMode] = useState(false);
@@ -268,7 +268,7 @@ export default function ServiceManagerPage() {
                                 : null,
                     }}
                     refetch={refetch}
-                    // data={data?.services}
+                    data={data?.services}
                     setNewService={setSelectedService} // update formService, not selectedService
                     onClose={() => setShowFormModal(false)}
                     onSave={() => {
