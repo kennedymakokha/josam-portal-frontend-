@@ -7,7 +7,6 @@ export type InputOption = {
 export type InputField = {
   name: string;
   type: 'text' | 'number' | 'password' | 'selectbox' | 'radio' | 'date' | 'checkbox';
-  // @ts-ignore
   value: string | boolean | number | any[];
   required: boolean;
   options?: InputOption[];
