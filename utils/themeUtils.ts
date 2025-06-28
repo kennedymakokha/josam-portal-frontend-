@@ -31,3 +31,15 @@ export function lightenColor(hex: string, percent: number) {
   const B = Math.min(255, (num & 0x0000FF) + amt);
   return `rgb(${R}, ${G}, ${B})`;
 }
+
+export function isColorWhite(hex: string): boolean {
+  const color = hex.length === 4
+    ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
+    : hex;
+
+  const r = parseInt(color.slice(1, 3), 16);
+  const g = parseInt(color.slice(3, 5), 16);
+  const b = parseInt(color.slice(5, 7), 16);
+
+  return r > 240 && g > 240 && b > 240;
+}

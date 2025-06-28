@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    domains: ["form-builder.mtandao.app","localhost"],
+    domains: ["form-builder.mtandao.app","localhost","3589-41-90-184-236.ngrok-free.app","3589-41-90-184-236.ngrok-free.app"],
 
     // domains: ['app.kersacco.co.ke',"localhost","formbuilder.mtandao.app"],
     remotePatterns: [

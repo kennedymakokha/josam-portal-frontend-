@@ -34,7 +34,7 @@ export const injectEndpoints = api.injectEndpoints({
             }),
         }),
         getServices: builder.query<Service[], FetchParams>({
-            query: ({ name }) => `/services?app_name=${name}`,
+            query: ({ name }) => `/services`,
         }),
     }),
 });
@@ -44,5 +44,7 @@ export const {
     useToggleactiveServiceMutation,
     useDeleteServiceMutation,
     useUpdateServiceMutation,
+    
+    
     useGetServicesQuery,
 } = injectEndpoints;

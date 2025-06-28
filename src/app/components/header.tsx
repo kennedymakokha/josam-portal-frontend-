@@ -59,6 +59,12 @@ export default function Header() {
         // Optionally redirect to login page or show a message
     };
 
+    useEffect(() => {
+        if (!user) {
+            router.push('/auth');
+        }
+    }, [])
+
     return (
         <header
             className="shadow p-4 flex justify-between items-center"

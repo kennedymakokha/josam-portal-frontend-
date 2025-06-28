@@ -27,6 +27,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { user } = useSelector((state: RootState) => state.auth)
 
   useEffect(() => {
+    
     if (user) {
       if (user?.role === 'superadmin') {
         router.push('/admin');

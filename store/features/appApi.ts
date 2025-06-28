@@ -24,10 +24,10 @@ export const injectEndpoints = api.injectEndpoints({
         }),
 
         getThemes: builder.query<Theme, FetchThemeParams>({
-            query: (params) => `/theme/apps/all?id=${params.id}`,
+            query: (params) => `/theme`,
         }),
         getTheme: builder.query<Theme, FetchThemeParams>({
-            query: (params) => `/theme/apps/id=${params.id}`,
+            query: (params) => `/theme/${params.id}`,
         }),
         deleteTheme: builder.mutation<void, string>({
             query: (id) => ({

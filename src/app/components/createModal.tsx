@@ -5,7 +5,10 @@ import {
   useRegisterServiceMutation,
   useUpdateServiceMutation,
 } from '../../../store/features/serviceApi';
-import { Service } from '../admin/dashboard/forms/page';
+
+import LoanDetailsSection from './ServiceFormModal/LoanDetailsSection';
+import InputFieldSection from './ServiceFormModal/InputFieldSection';
+import { Service } from '../../../types/forms';
 
 type InputOption = {
   label: string;
@@ -32,11 +35,12 @@ type ServiceData = {
   name: string;
   _id?: string;
   inputs: InputField[];
-  app_name: string
+  app_name: string;
   apiEndpoint?: string;
   image?: File | null;
   category?: string;
   loanDetails?: LoanDetails;
+  loanType?: string; // <-- NEW
 };
 
 interface ServiceFormModalProps {
@@ -46,6 +50,7 @@ interface ServiceFormModalProps {
   onClose: () => void;
   onSave: (service: ServiceData) => void;
   refetch: () => void;
+  data?: []
 }
 
 const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
@@ -53,6 +58,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
   newService,
   refetch,
   onClose,
+  data
 }) => {
   const [localService, setLocalService] = useState<ServiceData>(newService);
 
@@ -120,7 +126,8 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
     if (localService.apiEndpoint)
       formData.append('apiEndpoint', localService.apiEndpoint);
     if (localService.image) formData.append('image', localService.image);
-    formData.append('category', localService.category || 'uncategorized'); // Ensure always sent
+    formData.append('category', localService.category || 'uncategorized');
+    if (localService.loanType) formData.append('loanType', localService.loanType); // <-- NEW
     formData.append('inputs', JSON.stringify(localService.inputs));
     if (localService.category === 'loan' && localService.loanDetails) {
       formData.append('loanDetails', JSON.stringify(localService.loanDetails));
@@ -128,15 +135,13 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
 
     try {
       if (editMode) {
-
         if (localService._id) {
-          await updateService({ data: formData, _id: localService?._id }).unwrap();
+          await updateService({ data: formData, _id: localService._id }).unwrap();
         } else {
           console.error('Cannot edit service without _id');
         }
         refetch();
       } else {
-
         await submitService(formData).unwrap();
       }
       refetch();
@@ -161,7 +166,6 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
         </h2>
 
         <div className="space-y-4">
-
           {/* Category Selector */}
           <select
             className="w-full border px-3 py-2 rounded"
@@ -174,9 +178,34 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
             }
           >
             <option value="">Select Category</option>
+            {/* {!data!.some((item: any) => item.category === "registration") &&  */}
+            <option value="registration">Sign up</option>
+            {/* }
+            {!data!.some((item: any) => item.category === "login") &&  */}
+            <option value="login">Login</option>
+            {/* } */}
             <option value="service">Service</option>
             <option value="loan">Loan</option>
+
           </select>
+
+          {/* Form Type Selector */}
+          {localService.category === 'loan' && <select
+            className="w-full border px-3 py-2 rounded"
+            value={localService.loanType || ''}
+            onChange={(e) =>
+              setLocalService((prev) => ({
+                ...prev,
+                loanType: e.target.value,
+              }))
+            }
+          >
+            <option value="">Select Form Type</option>
+            <option value="personal">Personal</option>
+            <option value="business">Business</option>
+            <option value="education">Education</option>
+            <option value="employment">Employment</option>
+          </select>}
 
           {/* Service Name */}
           <input
@@ -217,225 +246,44 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
               }
             />
           )}
-
-          {/* Loan Details Section */}
           {localService.category === 'loan' && (
-            <div className="p-4 bg-gray-100 border rounded space-y-3">
-              <h3 className="font-semibold text-lg">Loan Details</h3>
-
-              <label>
-                Amount
-                <input
-                  type="number"
-                  className="w-full border px-3 py-2 rounded"
-                  value={localService.loanDetails?.amount || ''}
-                  onChange={(e) =>
-                    setLocalService((prev) => ({
-                      ...prev,
-                      loanDetails: {
-                        ...(prev.loanDetails || {}),
-                        amount: Number(e.target.value) || 0,
-                      },
-                    }))
+            <LoanDetailsSection
+              loanDetails={localService.loanDetails}
+              setLoanDetails={(details) => 
+                setLocalService(prev => ({
+                  ...prev,
+                  loanDetails: {
+                    ...details,
+                    amount: Number(details.amount), // convert amount here
                   }
-                />
-              </label>
-
-              <label>
-                Interest Rate (%)
-                <input
-                  type="number"
-                  step="0.1"
-                  className="w-full border px-3 py-2 rounded"
-                  value={localService.loanDetails?.interestRate || ''}
-                  onChange={(e) =>
-                    setLocalService((prev) =>
-                    ({
-                      ...prev,
-                      loanDetails: {
-                        ...(prev.loanDetails ?? {}),
-                        interestRate: Number(e.target.value) || 0,
-                      },
-                    } as ServiceData)
-                    )
-                  }
-
-                />
-              </label>
-
-              <label>
-                Tenure (months)
-                <input
-                  type="number"
-                  className="w-full border px-3 py-2 rounded"
-                  value={localService.loanDetails?.tenure || ''}
-                  onChange={(e) =>
-                    setLocalService((prev) =>
-                    ({
-                      ...prev,
-                      loanDetails: {
-                        ...(prev.loanDetails ?? {}),
-                        tenure: Number(e.target.value) || 0,
-                      },
-                    } as ServiceData)
-                    )
-                  }
-
-                />
-              </label>
-
-              <div>
-                <label className="block font-semibold mb-1">Pros</label>
-                {(localService.loanDetails?.pros || []).map((pro, index) => (
-                  <input
-                    key={index}
-                    type="text"
-                    className="w-full border px-3 py-2 rounded mb-2"
-                    value={pro}
-
-                    onChange={(e) => {
-                      const newPros = [...(localService.loanDetails?.pros || [])];
-                      newPros[index] = e.target.value;
-                      setLocalService((prev) =>
-                      ({
-                        ...prev,
-                        loanDetails: {
-                          ...(prev.loanDetails ?? {}),
-                          pros: newPros,
-                        },
-                      } as ServiceData)
-
-                      )
-                    }}
-                  />
-                ))}
-                <button
-                  type="button"
-                  className="text-sm underline text-blue-600"
-                  onClick={() => {
-                    const newPros = [...(localService.loanDetails?.pros || []), ''];
-                    setLocalService((prev) =>
-                    ({
-                      ...prev,
-                      loanDetails: {
-                        ...(prev.loanDetails ?? {}),
-                        pros: newPros,
-                      },
-                    } as ServiceData)
-
-                    )
-                  }}
-                >
-                  + Add More Pros
-                </button>
-              </div>
-
-              <label>
-                Terms and Conditions
-                <textarea
-                  rows={4}
-                  className="w-full border px-3 py-2 rounded"
-                  placeholder="Terms and Conditions"
-                  value={localService.loanDetails?.termsAndConditions || ''}
-                  onChange={(e) =>
-                    setLocalService((prev) =>
-                    ({
-                      ...prev,
-                      loanDetails: {
-                        ...(prev.loanDetails ?? {}),
-                        termsAndConditions: e.target.value,
-                      },
-                    } as ServiceData)
-                    )
-                  }
-
-                />
-              </label>
-            </div>
+                }))
+              }
+              // setLoanDetails={(details) =>
+              //   setLocalService(prev => ({
+              //     ...prev,
+              //     loanDetails: {
+              //       ...prev.loanDetails,
+              //       amount: Number(value),  // convert string to number explicitly
+              //     },
+              //   }))
+              //   // setLocalService((prev) => ({
+              //   //   ...prev,
+              //   //   loanDetails: details,
+              //   // }))
+              // }
+            />
           )}
 
-          {/* Dynamic Inputs */}
           {localService.inputs.map((input, index) => (
-            <div
+            <InputFieldSection
               key={index}
-              className="p-4 bg-gray-100 border rounded space-y-2"
-            >
-              <input
-                type="text"
-                className="w-full border px-3 py-2 rounded"
-                placeholder="Input name"
-                value={input.name}
-                onChange={(e) => handleInputChange(index, 'name', e.target.value)}
-              />
-              <select
-                className="w-full border px-3 py-2 rounded"
-                value={input.type}
-                onChange={(e) =>
-                  handleInputChange(index, 'type', e.target.value as InputField['type'])
-                }
-              >
-                <option value="text">Text</option>
-                <option value="number">Number</option>
-                <option value="password">Password</option>
-                <option value="selectbox">Select Box</option>
-                <option value="radio">Radio</option>
-                <option value="date">Date</option>
-                <option value="checkbox">Checkbox</option>
-              </select>
-              <input
-                type="text"
-                className="w-full border px-3 py-2 rounded"
-                placeholder="Input value"
-                value={String(input.value ?? '')}
-                onChange={(e) => handleInputChange(index, 'value', e.target.value)}
-              />
-              <label className="inline-flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={input.required}
-                  onChange={(e) => handleInputChange(index, 'required', e.target.checked)}
-                />
-                Required
-              </label>
-
-              {/* Options for selectbox, radio */}
-              {(input.type === 'selectbox' || input.type === 'radio') && (
-                <div className="mt-2 space-y-2">
-                  <label className="block font-semibold">Options</label>
-                  {(input.options || []).map((option, idx) => (
-                    <div key={idx} className="flex gap-2 items-center">
-                      <input
-                        type="text"
-                        className="border px-2 py-1 rounded flex-grow"
-                        placeholder="Label"
-                        value={option.label}
-                        onChange={(e) =>
-                          handleOptionChange(index, idx, 'label', e.target.value)
-                        }
-                      />
-                      <input
-                        type="text"
-                        className="border px-2 py-1 rounded flex-grow"
-                        placeholder="Value"
-                        value={option.value}
-                        onChange={(e) =>
-                          handleOptionChange(index, idx, 'value', e.target.value)
-                        }
-                      />
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    className="text-sm underline text-blue-600"
-                    onClick={() => addOption(index)}
-                  >
-                    + Add Option
-                  </button>
-                </div>
-              )}
-            </div>
+              input={input}
+              index={index}
+              onInputChange={handleInputChange}
+              onOptionChange={handleOptionChange}
+              onAddOption={addOption}
+            />
           ))}
-
           <button
             type="button"
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"

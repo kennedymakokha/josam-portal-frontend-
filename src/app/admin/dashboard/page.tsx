@@ -1,66 +1,67 @@
-'use client';
+'use client'
+import { motion } from 'framer-motion';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useContext, useEffect } from 'react';
-import { ThemeContext } from '../../../../context/themeContext';
-import { useSearchParams } from 'next/navigation';
-import { useGetThemeQuery } from '../../../../store/features/appApi';
-import Image from 'next/image';
 import { useSelector } from 'react-redux';
+import { ThemeContext } from '../../../../context/themeContext';
+// import { useRouter } from 'ne';
 import { RootState } from '../../../../store/store';
+import { lightenColor } from '../../../../utils/themeUtils';
 
-
-export default function Home() {
+export default function Dashboard() {
   const searchParams = useSearchParams();
   const nameParam = searchParams.get('name');
   const { user } = useSelector((state: RootState) => state.auth)
   const {
-    setPrimaryColor,
-    setTagline,
-    setLogo,
-    setAppname,
+
     primaryColor,
     tagline,
     logo,
     app_name,
   } = useContext(ThemeContext);
 
-  // const { data: theme } = useGetThemeQuery(
-  //   { id: nameParam || user?.app_id as string },
-  //   { skip: !nameParam || !user?.app_id }
-  // );
-
-  // useEffect(() => {
-  //   if (!theme) return;
-
-  //   setPrimaryColor(theme.primaryColor);
-  //   setTagline(theme.tagline);
-  //   setLogo(theme.logo);
-  //   setAppname(theme.app_name);
-  // }, [theme, setAppname, setPrimaryColor, setLogo, setTagline]);
-
+  const router = useRouter();
+  useEffect(() => {
+    if (user?.role !== 'admin') {
+      router.push('/');
+    }
+  }, [user, router]);
   return (
-    <div
-      style={{ background: primaryColor }}
-      className="flex flex-col items-center justify-center min-h-screen p-8"
+
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="bg-white rounded-xl shadow-md p-6"
     >
-      {logo && (
-        <Image
-          height={160}
-          width={160}
-          src={logo}
-          alt="Logo"
-          className="w-40 h-40 object-contain mb-4"
-        />
-      )}
-      <h1 className="text-4xl font-bold mb-2">
-        Welcome to {app_name || 'My App'}
-      </h1>
-      <p className="text-lg mb-6">{tagline}</p>
-      <button
-        style={{ backgroundColor: primaryColor }}
-        className="text-white px-4 py-2 rounded shadow"
-      >
-        Themed Button
-      </button>
-    </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Example Cards */}
+        <motion.div
+          style={{ background: lightenColor(primaryColor, 10) }}
+          whileHover={{ scale: 1.03 }}
+          className="bg-blue-500 text-white p-4 rounded-lg shadow"
+        >
+          <p className="text-lg font-medium">Users</p>
+          <p className="text-2xl font-bold">1,204</p>
+        </motion.div>
+        <motion.div
+          whileHover={{ scale: 1.03 }}
+          className="bg-green-500 text-white p-4 rounded-lg shadow"
+        >
+          <p className="text-lg font-medium">Forms</p>
+          <p className="text-2xl font-bold">$8,492</p>
+        </motion.div>
+        <motion.div
+        style={{ background: lightenColor("#FF0000", 10) }}
+          whileHover={{ scale: 1.03 }}
+          className="bg-green-500 text-white p-4 rounded-lg shadow"
+        >
+          <p className="text-lg font-medium">Services</p>
+          <p className="text-2xl font-bold">$8,492</p>
+        </motion.div>
+      </div>
+    </motion.div>
+
   );
 }

@@ -1,13 +1,14 @@
 'use client';
 
-import { useContext, ChangeEvent, useState } from 'react';
+import { useContext, ChangeEvent, useState, useEffect } from 'react';
 import { ThemeContext } from '../../../context/themeContext';
-import { useGetThemeQuery, useRegisterThemeMutation } from '../../../store/features/appApi';
+import { useGetThemeQuery, useGetThemesQuery, useRegisterThemeMutation } from '../../../store/features/appApi';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import DataTable from '../components/DataTable';
-
 import { useGenerateCodeMutation } from '../../../store/features/codeApi';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 type Theme = {
     primaryColor: string;
     tagline: string;
@@ -15,6 +16,7 @@ type Theme = {
     code?: string | null; // Assuming code is a string or null
     _id?: string;
     logo: string | null;
+    scratch_no: string
 };
 
 export default function AdminPage() {
@@ -30,10 +32,10 @@ export default function AdminPage() {
     } = useContext(ThemeContext);
 
     const router = useRouter();
-    const { data: apps, refetch } = useGetThemeQuery<{ data: Theme[] }>({ id: 'all' });
+    const { data: apps, refetch } = useGetThemesQuery<{ data: Theme[] }>({ id: 'all' });
     const [submit, { isLoading: saving }] = useRegisterThemeMutation();
     const [generate] = useGenerateCodeMutation();
-
+    const { user } = useSelector((state: RootState) => state.auth)
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [logoFile, setLogoFile] = useState<File | null>(null);
     const [qrImage, setQrImage] = useState('');
@@ -115,6 +117,12 @@ export default function AdminPage() {
         setLogo(null);
         setLogoFile(null);
     };
+    useEffect(() => {
+        if (user?.role !== 'superadmin') {
+            router.push('/');
+        }
+    }, [user, router]);
+    console.log(apps && apps[0].scratch_no)
     return (
         <div className="min-h-screen p-8 text-black mx-auto bg-slate-100">
             <div className="flex justify-between items-center mb-6">
@@ -133,6 +141,7 @@ export default function AdminPage() {
                     columns={[
                         { key: 'app_name', label: 'App Name' },
                         { key: 'tagline', label: 'Tagline' },
+                        { key: 'scratch_no', label: 'APP Number' },
                         {
                             key: 'primaryColor',
                             label: 'Primary Color',
@@ -143,6 +152,7 @@ export default function AdminPage() {
                                 />
                             ),
                         },
+                       
                         {
                             key: 'logo',
                             label: 'Logo',
@@ -185,7 +195,7 @@ export default function AdminPage() {
                                 </svg>
                             ),
                             onClick: (row) => {
-                                router.push(`/admin/dashboard`);
+                                router.push(`/admin/${row.app_name}`)
                                 setAppname(row.app_name);
                                 setPrimaryColor(row.primaryColor);
                                 setTagline(row.tagline);

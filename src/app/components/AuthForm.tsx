@@ -19,6 +19,7 @@ export default function AuthForm({ setIsLogin, isLogin }: AuthFormProps) {
     fcm_token: "fSUKQBQSTnOU6Vn7aygyPw:APA91bHFRWNbsOCj6Vdrri4QY-NBZz-H4ZhmzKVlJu6EoI9kYWP6nY2cgP9WI0MIOhn8FLmGjiMzLYg1CbMmpfdJbxHoeteJKCSieSu_xvf8ZMOQekgg09Y",
     name: '',
     phone_number: '',
+    app_no: "0997",
     email: '',
   });
   const dispatch = useDispatch()
@@ -59,7 +60,7 @@ export default function AuthForm({ setIsLogin, isLogin }: AuthFormProps) {
 
     try {
       if (isLogin) {
-        const res = await loginUser({ fcm_token: formData.fcm_token, identifier: formData.identifier, password: formData.password }).unwrap() as LoginResponse;
+        const res = await loginUser({ app_no: formData.identifier !== "0700000000" ? "" : formData.app_no, fcm_token: formData.fcm_token, identifier: formData.identifier, password: formData.password }).unwrap() as LoginResponse;
         console.log(res, "login response")
         dispatch(loginSuccess({
           token: res.token,

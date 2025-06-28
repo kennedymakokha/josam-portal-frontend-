@@ -13,46 +13,11 @@ import {
     useDeleteServiceMutation,
     useToggleactiveServiceMutation,
 } from '../../../../../store/features/serviceApi';
-import { skipToken } from '@reduxjs/toolkit/query';
+import { InputField, RawService, Service } from '../../../../../types/forms';
+import { isInputsStringArray } from '../../../../../utils/serviceUtils';
 
-export type InputOption = {
-    label: string;
-    value: string;
-};
-interface RawService {
-    _id?: string;
-    name: string;
-    inputs: string[] | InputField[]; // could be either
-    app_name: string;
-    apiEndpoint: string;
-    image?: File | string | null;
-    active?: boolean;
-    category?: string;
-}
-export type InputField = {
-    name: string;
-    type: 'text' | 'number' | 'password' | 'selectbox' | 'radio' | 'date' | 'checkbox';
-    value: string | number | boolean;
-    required: boolean;
-    options?: InputOption[]; // only for selectbox or radio
-};
-export interface Service {
-    _id?: string;
-    name: string;
-    inputs: InputField[];
-    app_name: string;
-    apiEndpoint: string;
-    image?: File | string | null;
-    active?: boolean;
-    category?: string;
-}
-function isInputsStringArray(inputs: unknown): inputs is string[] {
-    return (
-        Array.isArray(inputs) &&
-        inputs.length > 0 &&
-        typeof inputs[0] === 'string'
-    );
-}
+
+
 // Handle either File or string URL image values
 function ImageCell({ val }: { val: string | File | null | undefined }) {
     const [objectUrl, setObjectUrl] = useState<string | null>(null);
@@ -87,16 +52,8 @@ export default function ServiceManagerPage() {
     const [toggleService] = useToggleactiveServiceMutation();
     const [selectedService, setSelectedService] = useState<Service | null>(null);
     const [appName, setAppName] = useState<string | null>(null);
-    console.log(selectedService)
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            setAppName(localStorage.getItem('app_name'));
-        }
-    }, []);
-
-    const { data, refetch, isFetching } = useGetServicesQuery(
-        appName ? { name: appName } : skipToken // <-- only fetch if appName is available
-    );
+    const { data, refetch, isFetching } = useGetServicesQuery({});
+    
     const servicesData: Service[] = (data as { services?: RawService[] })?.services?.map((s) => {
         let parsedInputs: InputField[] = [];
 
@@ -116,7 +73,7 @@ export default function ServiceManagerPage() {
             inputs: parsedInputs,
         };
     }) ?? [];
-
+    console.log("DATA", data)
     // States for modals and table
     const [showFormModal, setShowFormModal] = useState(false);
     const [editMode, setEditMode] = useState(false);
@@ -206,9 +163,9 @@ export default function ServiceManagerPage() {
     const handleInputChange = (key: string, value: string) => {
         setFormData(prev => ({ ...prev, [key]: value }));
     };
-
+  
     return (
-        <div className="p-6 bg-gray-100 min-h-screen space-y-6">
+        <div className="p-6 bg-gray-100 min-h-screen text-black space-y-6">
             {/* Header & Controls */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <h1
@@ -311,6 +268,7 @@ export default function ServiceManagerPage() {
                                 : null,
                     }}
                     refetch={refetch}
+                    // data={data?.services}
                     setNewService={setSelectedService} // update formService, not selectedService
                     onClose={() => setShowFormModal(false)}
                     onSave={() => {

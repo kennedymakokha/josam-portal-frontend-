@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { useContext } from 'react';
 import Image from 'next/image';
 import { ThemeContext } from '../../../context/themeContext';
+import { isColorWhite, lightenColor } from '../../../utils/themeUtils';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 
 // Navigation items
 const navItems = [
@@ -13,17 +16,7 @@ const navItems = [
 ];
 
 // Helper: detect if color is white or near-white
-function isColorWhite(hex: string): boolean {
-    const color = hex.length === 4
-        ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
-        : hex;
 
-    const r = parseInt(color.slice(1, 3), 16);
-    const g = parseInt(color.slice(3, 5), 16);
-    const b = parseInt(color.slice(5, 7), 16);
-
-    return r > 240 && g > 240 && b > 240;
-}
 
 export default function Sidebar() {
     const {
@@ -31,12 +24,32 @@ export default function Sidebar() {
         app_name,
         logo,
     } = useContext(ThemeContext);
-
+    const { user } = useSelector((state: RootState) => state.auth)
     const isWhite = isColorWhite(primaryColor);
     const bgColor = isWhite ? '#f9fafb' : primaryColor;
     const textColor = isWhite ? '#111827' : '#ffffff';
-    const hoverColor = isWhite ? '#e5e7eb' : '#2563eb';
+    const hoverColor = isWhite ? '#e5e7eb' : lightenColor(primaryColor,20);
+    const Adminroutes = [
+        {
+            title: "Dashboard",
+            path: "/admin/dashboard",
+            nested: true,
+            icon: "wallet-sharp"
+        },
+        { title: 'Forms', path: '/admin/dashboard/forms' },
+        { title: 'Settings', path: '/settings' },
+    ]
 
+    const superAdminroutes = [
+        {
+            title: "Dashboard",
+            path: "/admin",
+            nested: true,
+            icon: "swap-horizontal-outline"
+        },
+
+    ]
+    const navItems = user?.role === 'superadmin' ? superAdminroutes : Adminroutes;
     return (
         <div
             className="w-64 min-h-screen shadow-md hidden md:block"
@@ -70,7 +83,7 @@ export default function Sidebar() {
                                 (e.currentTarget.style.backgroundColor = 'transparent')
                             }
                         >
-                            {item.name}
+                            {item.title}
                         </span>
                     </Link>
                 ))}
