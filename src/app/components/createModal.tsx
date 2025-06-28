@@ -178,12 +178,12 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
             }
           >
             <option value="">Select Category</option>
-            {/* {!data!.some((item: any) => item.category === "registration") &&  */}
-            <option value="registration">Sign up</option>
-            {/* }
-            {!data!.some((item: any) => item.category === "login") &&  */}
-            <option value="login">Login</option>
-            {/* } */}
+            {!data!.some((item: any) => item.category === "registration") &&
+              <option value="registration">Sign up</option>
+            }
+            {!data!.some((item: any) => item.category === "login") &&
+              <option value="login">Login</option>
+            }
             <option value="service">Service</option>
             <option value="loan">Loan</option>
 
@@ -249,7 +249,7 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
           {localService.category === 'loan' && (
             <LoanDetailsSection
               loanDetails={localService.loanDetails}
-              setLoanDetails={(details) => 
+              setLoanDetails={(details) =>
                 setLocalService(prev => ({
                   ...prev,
                   loanDetails: {
@@ -258,19 +258,19 @@ const ServiceFormModal: React.FC<ServiceFormModalProps> = ({
                   }
                 }))
               }
-              // setLoanDetails={(details) =>
-              //   setLocalService(prev => ({
-              //     ...prev,
-              //     loanDetails: {
-              //       ...prev.loanDetails,
-              //       amount: Number(value),  // convert string to number explicitly
-              //     },
-              //   }))
-              //   // setLocalService((prev) => ({
-              //   //   ...prev,
-              //   //   loanDetails: details,
-              //   // }))
-              // }
+            // setLoanDetails={(details) =>
+            //   setLocalService(prev => ({
+            //     ...prev,
+            //     loanDetails: {
+            //       ...prev.loanDetails,
+            //       amount: Number(value),  // convert string to number explicitly
+            //     },
+            //   }))
+            //   // setLocalService((prev) => ({
+            //   //   ...prev,
+            //   //   loanDetails: details,
+            //   // }))
+            // }
             />
           )}
 

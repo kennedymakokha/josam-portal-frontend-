@@ -19,7 +19,7 @@ export default function AppProfile() {
 
     const [editing, setEditing] = useState(false);
     const [form, setForm] = useState<AppData | null>(null);
-    const [updateTheme, { isLoading }] = useUpdateThemeMutation();
+    const [updateTheme] = useUpdateThemeMutation();
     const { user } = useSelector((state: RootState) => state.auth)
     const { data: app, refetch } = useGetThemeQuery(
         { id: user?.app_id as string },
@@ -34,20 +34,57 @@ export default function AppProfile() {
     };
 
     const handleSave = async () => {
-        await updateTheme(form).unwrap();
-        setForm(null)
-        await refetch();
-        setEditing(false);
+        if (!form || !form._id) return;
+
+        // Create a FormData instance
+        const formData = new FormData();
+        formData.append('app_name', form.app_name);
+        formData.append('tagline', form.tagline);
+        formData.append('logo', form.logo);
+        formData.append('code', form.code);
+        formData.append('primaryColor', form.primaryColor);
+
+        const payload = {
+            _id: form._id,
+            data: formData,
+        };
+
+        try {
+            await updateTheme(payload).unwrap();
+            setForm(null);
+            await refetch();
+            setEditing(false);
+        } catch (error) {
+            console.error('Failed to update theme', error);
+            alert('Failed to save changes.');
+        }
     };
 
-    if (!app) return <p className="text-center text-gray-500">Loading...</p>;
 
+    if (!app) return <p className="text-center text-gray-500">Loading...</p>;
+    const toggleEditing = () => {
+        if (!editing) {
+            // Enter edit mode, initialize form with app data
+            setForm(app as AppData);
+            setEditing(true);
+        } else {
+            // Cancel edit mode, clear form
+            setForm(null);
+            setEditing(false);
+        }
+    };
     return (
         <div className="max-w-xl mx-auto p-6 bg-white text-black rounded shadow mt-10">
             <div className="flex items-center justify-between mb-4">
                 <h1 className="text-2xl font-semibold text-gray-800">App Profile</h1>
-                <button
+                {/* <button
                     onClick={() => { setEditing(!editing); setForm(app !== undefined && app) }}
+                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                    {editing ? 'Cancel' : 'Edit'}
+                </button> */}
+                <button
+                    onClick={toggleEditing}
                     className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
                     {editing ? 'Cancel' : 'Edit'}
@@ -108,12 +145,13 @@ export default function AppProfile() {
                             className="mt-1 block w-full border border-gray-300 rounded p-2"
                         />
                     ) : (
-                        <Image height={68} width={68} src={app.logo} alt="App Logo" className="h-16 mt-1 rounded" />
+                        <Image height={68} width={68} src={app.logo ?? ''} alt="App Logo" className="h-16 mt-1 rounded" />
                     )}
                 </div>
 
                 {editing && (
                     <button
+                    
                         onClick={handleSave}
                         className="w-full mt-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                     >

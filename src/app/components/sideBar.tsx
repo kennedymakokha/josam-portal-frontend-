@@ -8,12 +8,7 @@ import { isColorWhite, lightenColor } from '../../../utils/themeUtils';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 
-// Navigation items
-const navItems = [
-    { name: 'Dashboard', path: '/admin' },
-    { name: 'Forms', path: '/admin/dashboard/forms' },
-    { name: 'Settings', path: '/settings' },
-];
+
 
 // Helper: detect if color is white or near-white
 

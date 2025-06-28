@@ -10,7 +10,7 @@ const LoanDetailsSection: React.FC<LoanDetailsSectionProps> = ({
     loanDetails,
     setLoanDetails,
 }) => {
-    const handleChange = (key: keyof LoanDetails, value: any) => {
+    const handleChange = <K extends keyof LoanDetails>(key: K, value: LoanDetails[K]) => {
         setLoanDetails({ ...loanDetails, [key]: value });
     };
 

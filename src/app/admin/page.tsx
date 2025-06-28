@@ -2,7 +2,7 @@
 
 import { useContext, ChangeEvent, useState, useEffect } from 'react';
 import { ThemeContext } from '../../../context/themeContext';
-import { useGetThemeQuery, useGetThemesQuery, useRegisterThemeMutation } from '../../../store/features/appApi';
+import {  useGetThemesQuery, useRegisterThemeMutation } from '../../../store/features/appApi';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import DataTable from '../components/DataTable';

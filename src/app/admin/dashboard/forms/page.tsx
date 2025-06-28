@@ -53,7 +53,7 @@ export default function ServiceManagerPage() {
     const [selectedService, setSelectedService] = useState<Service | null>(null);
     const [appName, setAppName] = useState<string | null>(null);
     const { data, refetch, isFetching } = useGetServicesQuery({});
-    
+    console.log(selectedService)
     const servicesData: Service[] = (data as { services?: RawService[] })?.services?.map((s) => {
         let parsedInputs: InputField[] = [];
 
@@ -163,7 +163,7 @@ export default function ServiceManagerPage() {
     const handleInputChange = (key: string, value: string) => {
         setFormData(prev => ({ ...prev, [key]: value }));
     };
-  
+
     return (
         <div className="p-6 bg-gray-100 min-h-screen text-black space-y-6">
             {/* Header & Controls */}

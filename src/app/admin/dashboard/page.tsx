@@ -1,6 +1,6 @@
 'use client'
 import { motion } from 'framer-motion';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useContext, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { ThemeContext } from '../../../../context/themeContext';
@@ -9,15 +9,12 @@ import { RootState } from '../../../../store/store';
 import { lightenColor } from '../../../../utils/themeUtils';
 
 export default function Dashboard() {
-  const searchParams = useSearchParams();
-  const nameParam = searchParams.get('name');
+
   const { user } = useSelector((state: RootState) => state.auth)
   const {
 
     primaryColor,
-    tagline,
-    logo,
-    app_name,
+   
   } = useContext(ThemeContext);
 
   const router = useRouter();
@@ -53,7 +50,7 @@ export default function Dashboard() {
           <p className="text-2xl font-bold">$8,492</p>
         </motion.div>
         <motion.div
-        style={{ background: lightenColor("#FF0000", 10) }}
+          style={{ background: lightenColor("#FF0000", 10) }}
           whileHover={{ scale: 1.03 }}
           className="bg-green-500 text-white p-4 rounded-lg shadow"
         >

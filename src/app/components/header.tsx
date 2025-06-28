@@ -63,7 +63,7 @@ export default function Header() {
         if (!user) {
             router.push('/auth');
         }
-    }, [])
+    }, [router,user])
 
     return (
         <header

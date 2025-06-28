@@ -4,6 +4,7 @@ import { InputField, InputOption } from './types';
 interface InputFieldSectionProps {
   input: InputField;
   index: number;
+  // @ts-ignore
   onInputChange: (index: number, key: keyof InputField, value: any) => void;
   onOptionChange: (
     fieldIndex: number,
