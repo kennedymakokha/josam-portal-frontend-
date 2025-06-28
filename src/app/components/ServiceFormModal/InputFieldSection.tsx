@@ -1,11 +1,15 @@
-"@typescript-eslint/no-explicit-any" 
+"@typescript-eslint/no-explicit-any"
 import React from 'react';
 import { InputField, InputOption } from './types';
 
 interface InputFieldSectionProps {
   input: InputField;
   index: number;
-  onInputChange: (index: number, key: keyof InputField, value: any) => void;
+  onInputChange: <K extends keyof InputField>(
+    index: number,
+    key: K,
+    value: InputField[K]
+  ) => void;
   onOptionChange: (
     fieldIndex: number,
     optionIndex: number,
@@ -14,6 +18,7 @@ interface InputFieldSectionProps {
   ) => void;
   onAddOption: (fieldIndex: number) => void;
 }
+
 
 const InputFieldSection: React.FC<InputFieldSectionProps> = ({
   input,

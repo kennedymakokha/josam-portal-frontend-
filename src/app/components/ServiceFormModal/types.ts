@@ -7,7 +7,7 @@ export type InputOption = {
 export type InputField = {
   name: string;
   type: 'text' | 'number' | 'password' | 'selectbox' | 'radio' | 'date' | 'checkbox';
-  value: string | boolean | number | any[];
+  value: string | boolean | number | string[];
   required: boolean;
   options?: InputOption[];
 };
