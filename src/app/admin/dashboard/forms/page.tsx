@@ -53,7 +53,7 @@ export default function ServiceManagerPage() {
     const [selectedService, setSelectedService] = useState<Service | null>(null);
   
     const { data, refetch, isFetching } = useGetServicesQuery({});
-
+    console.log(selectedService)
     const servicesData: Service[] = (data as { services?: RawService[] })?.services?.map((s) => {
         let parsedInputs: InputField[] = [];
 
